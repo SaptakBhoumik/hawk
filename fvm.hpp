@@ -10,6 +10,7 @@ typedef long double num;
 enum opcodes {
   OP_DEF,//default
   //Operations with number//
+  OP_MOD,
   OP_NEG,
   OP_ADD,  /* add  */
   OP_SUB,  /* subtract  */

@@ -1,6 +1,6 @@
 #include "fvm.hpp"
-#define bin_op(op_arg) advance();auto r1=(size_t)op;advance();auto r2=(size_t)op;advance();memory[(size_t)op]=memory[r1] op_arg memory[r2];
-#define uranary_op(op_arg) advance();auto r1=(size_t)op;advance();memory[(size_t)op]=op_arg memory[r1];
+#define bin_op(op_arg,T1,T2) advance();auto r1=(size_t)op;advance();auto r2=(size_t)op;advance();memory[(size_t)op]=(T1)memory[r1] op_arg (T2)memory[r2];
+#define uranary_op(op_arg,T1) advance();auto r1=(size_t)op;advance();memory[(size_t)op]=op_arg (T1)memory[r1];
 namespace FVM{
 VM::VM(){}
 void VM::execute(){
@@ -15,19 +15,23 @@ void VM::execute(){
         }
         else if (op==OP_ADD){
             //add <register1> <register2> <register>
-            bin_op(+)
+            bin_op(+,num,num)
         }
         else if (op==OP_SUB){
             //sub <register1> <register2> <register>
-            bin_op(-)
+            bin_op(-,num,num)
         }
         else if (op==OP_DIV){
             //div <register1> <register2> <register>
-            bin_op(/)
+            bin_op(/,num,num)
         }
         else if (op==OP_MUL){
             //mul <register1> <register2> <register>
-            bin_op(*)
+            bin_op(*,num,num)
+        }
+        else if (op==OP_MOD){
+            //mod <register1> <register2> <register>
+            bin_op(%,int64_t,int64_t)
         }
         else if (op==OP_EXIT){
             //exit <register>
@@ -38,14 +42,14 @@ void VM::execute(){
             //htl
             return;
         }
+        else if (op==OP_NEG){
+            //neg <register1> <register>
+            uranary_op(-,num)
+        }
         else if (op==OP_POP){
             //pop <register>
             advance();
             memory[(size_t)op]=0;
-        }
-        else if (op==OP_NEG){
-            //neg <register1> <register>
-            uranary_op(-) 
         }
         else if ((code.size()-1)>curr_index){printf("Invalid optcode %Lf at %ld\n",op,curr_index+1);exit(1);}
         if((code.size()-1)<=curr_index){break;}
@@ -123,6 +127,13 @@ int main(){
     x.add_item(3);
     x.execute();
     assert(x.memory[3]==-3);
+    x.advance();
+    x.add_item(OP_MOD);
+    x.add_item(2);
+    x.add_item(1);
+    x.add_item(3);
+    x.execute();
+    assert(x.memory[3]==1);
     std::cout<<x.memory[3]<<"\n";
     // x.advance();
     // x.add_item(OP_EXIT);

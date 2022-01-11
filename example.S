@@ -9,6 +9,8 @@ sub 3 4 5 ;Subtract the value of register 4 from the value of register 3 and ass
 div 3 4 5 ;Divide the value of register 3 with the value of register 4 and assign it to register 5
 ;mul <register1> <register2> <register>
 mul 3 4 5 ;Multiply the value of register 3 and 4 and assign it to register 5
+;mod <register1> <register2> <register>
+mod 3 4 5 ;Mod of the value of register 3 and 4 and assign it to register 5
 ;pop <register>
 pop 5 ;Assign register 5 to 0
 ;neg <register1> <register>
