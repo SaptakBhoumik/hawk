@@ -1,10 +1,7 @@
 #ifndef MAIN__FVM__HPP
 #define MAIN__FVM__HPP
-#include <cstdint>
 #include <fstream>
-#include <cstdio>
 #include <cassert>
-#include <unistd.h>
 #include <vector>
 #include <iostream>
 namespace FVM{
@@ -12,11 +9,15 @@ typedef long double num;
 /* Opcodes */
 enum opcodes {
   OP_DEF,//default
+  //Operations with number//
+  OP_NEG,
   OP_ADD,  /* add  */
   OP_SUB,  /* subtract  */
   OP_DIV,  /* divide  */
   OP_MUL,  /* multiply  */
+  //********************//
   OP_MOV,  /*Move a value to an register*/
+  OP_POP,  //Assign the register to 0
   OP_EXIT,  /*exit*/
   OP_HAULT  /*hault*/
 };

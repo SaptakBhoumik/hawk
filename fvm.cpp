@@ -1,5 +1,6 @@
 #include "fvm.hpp"
 #define bin_op(op_arg) advance();auto r1=(size_t)op;advance();auto r2=(size_t)op;advance();memory[(size_t)op]=memory[r1] op_arg memory[r2];
+#define uranary_op(op_arg) advance();auto r1=(size_t)op;advance();memory[(size_t)op]=op_arg memory[r1];
 namespace FVM{
 VM::VM(){}
 void VM::execute(){
@@ -37,6 +38,15 @@ void VM::execute(){
             //htl
             return;
         }
+        else if (op==OP_POP){
+            //pop <register>
+            advance();
+            memory[(size_t)op]=0;
+        }
+        else if (op==OP_NEG){
+            //neg <register1> <register>
+            uranary_op(-) 
+        }
         else if ((code.size()-1)>curr_index){printf("Invalid optcode %Lf at %ld\n",op,curr_index+1);exit(1);}
         if((code.size()-1)<=curr_index){break;}
         advance();
@@ -62,6 +72,7 @@ void VM::input(std::string filename){
 	while (r.read((char*)&i, sizeof(num))) {
 		code.push_back((num)i);
 	}
+    r.close();
 }
 }
 int main(){
@@ -101,6 +112,17 @@ int main(){
     x.add_item(3);
     x.execute();
     assert(x.memory[3]==12);
+    x.advance();
+    x.add_item(OP_POP);
+    x.add_item(3);
+    x.execute();
+    assert(x.memory[3]==0);
+    x.advance();
+    x.add_item(OP_NEG);
+    x.add_item(1);
+    x.add_item(3);
+    x.execute();
+    assert(x.memory[3]==-3);
     std::cout<<x.memory[3]<<"\n";
     // x.advance();
     // x.add_item(OP_EXIT);
@@ -111,6 +133,6 @@ int main(){
     auto y=VM();
     y.input("data.bin");
     y.execute();
-    std::cout<<x.memory[3]<<"\n";
+    std::cout<<y.memory[3]<<"\n";
     return 0;
 }
