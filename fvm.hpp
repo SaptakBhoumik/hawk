@@ -1,25 +1,15 @@
 #ifndef MAIN__FVM__HPP
 #define MAIN__FVM__HPP
-#include <stdint.h>
-#include <stdio.h>
-#include <sys/select.h>
+#include <cstdint>
+#include <cstdio>
 #include <unistd.h>
+#include <vector>
+#include <iostream>
+namespace FVM{
 
-enum resister {
-  R_R0,
-  R_R1,
-  R_R2,
-  R_R3,
-  R_R4,
-  R_R5,
-  R_R6,
-  R_R7,
-  R_PC, /* program counter */
-  R_COND,
-  R_COUNT
-};
 /* Opcodes */
 enum opcodes {
+  OP_DEF,//default
   OP_BR,   /* branch */
   OP_ADD,  /* add  */
   OP_LD,   /* load */
@@ -36,20 +26,21 @@ enum opcodes {
   OP_RES,  /* reserved (unused) */
   OP_LEA,  /* load effective address */
   OP_TRAP, /* execute trap */
+  OP_MOV,  /*Move a value to an register*/
   OP_EXIT  /*exit*/
 };
-enum condition {
-  FL_POS = 1 << 0, /* P */
-  FL_ZRO = 1 << 1, /* Z */
-  FL_NEG = 1 << 2, /* N */
-};
-class VM {
-  uint32_t memory[UINT32_MAX];
-  uint16_t reg[R_COUNT];
-  uint16_t mem_read(uint16_t address);
-  uint16_t check_key();
 
-public:
-  void execute();
+class VM {
+    size_t len=0;
+    size_t curr_index=0;
+    double code[UINT16_MAX];
+    double op=OP_DEF;
+    void advance();
+    public:
+    double memory[UINT16_MAX];
+    VM();
+    void execute();
+    void add_item(double item);
 };
+}
 #endif

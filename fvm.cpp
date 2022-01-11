@@ -1,47 +1,51 @@
 #include "fvm.hpp"
-#define PC_START 0x3000
-#define MR_KBSR  0xFE00
-#define MR_KBDR 0xFE02
-inline uint32_t sign_extend(uint32_t x, int bit_count)
-{
-    if ((x >> (bit_count - 1)) & 1) {
-        x |= (0xFFFF << bit_count);
-    }
-    return x;
-}
-uint16_t VM::check_key() {
-  fd_set readfds;
-  FD_ZERO(&readfds);
-  FD_SET(STDIN_FILENO, &readfds);
-
-  struct timeval timeout;
-  timeout.tv_sec = 0;
-  timeout.tv_usec = 0;
-  return select(1, &readfds, NULL, NULL, &timeout) != 0;
-}
-uint16_t VM::mem_read(uint16_t address) {
-  if (address == MR_KBSR) {
-    if (check_key()) {
-      memory[MR_KBSR] = (1 << 15);
-      memory[MR_KBDR] = getchar();
-    } else {
-      memory[MR_KBSR] = 0;
-    }
-  }
-  return memory[address];
-}
+#define bin_op(op_arg) {advance();auto r1=(size_t)op;advance();auto r2=(size_t)op;advance();memory[(size_t)op]=memory[r1]+memory[r2];}
+namespace FVM{
+VM::VM(){}
 void VM::execute(){
-    reg[R_COND] = FL_ZRO;
-    reg[R_PC] = PC_START;
-    while (true){
-        uint16_t instr = mem_read(reg[R_PC]++);
-        uint16_t op = instr >> 12;
-        switch(op){
-            case OP_ADD:{}
-            default:{}
+    op=code[0];
+    while(true){
+        if (op==OP_MOV){
+            //mov <value> <register>
+            advance();
+            auto value=op;
+            advance();
+            memory[(size_t)op]=value;
         }
+        else if (op==OP_ADD){
+            //ADD <register1> <register2> <register>
+            bin_op(+)
+        }
+        else if ((len-1)>curr_index){printf("Invalid optcode %f at %ld\n",op,curr_index+1);exit(1);}
+        if((len-1)<=curr_index){break;}
+        advance();
     }
+}
+void VM::add_item(double item){
+    code[len]=item;
+    len++;
+}
+void VM::advance(){
+    curr_index++;
+    op=code[curr_index];
+}
+
 }
 int main(){
+    using namespace FVM;
+    auto x=VM();
+    x.add_item(OP_MOV);
+    x.add_item(3);
+    x.add_item(1);
+    x.add_item(OP_MOV);
+    x.add_item(4);
+    x.add_item(2);
+    x.add_item(OP_ADD);
+    x.add_item(1);
+    x.add_item(2);
+    x.add_item(3);
+    // x.add_item(7);
+    x.execute();
+    std::cout<<x.memory[3];
     return 0;
 }
