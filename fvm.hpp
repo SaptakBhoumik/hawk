@@ -1,13 +1,14 @@
 #ifndef MAIN__FVM__HPP
 #define MAIN__FVM__HPP
 #include <cstdint>
+#include <fstream>
 #include <cstdio>
 #include <cassert>
 #include <unistd.h>
 #include <vector>
 #include <iostream>
 namespace FVM{
-
+typedef long double num;
 /* Opcodes */
 enum opcodes {
   OP_DEF,//default
@@ -21,16 +22,17 @@ enum opcodes {
 };
 
 class VM {
-    size_t len=0;
     size_t curr_index=0;
-    double code[UINT16_MAX];
-    double op=OP_DEF;
+    std::vector<num> code;
+    num op=OP_DEF;
     public:
-    void advance();
-    double memory[UINT16_MAX];
     VM();
+    void write(std::string filename);
+    void input(std::string filename);
+    void advance();
+    num memory[UINT16_MAX];
     void execute();
-    void add_item(double item);
+    void add_item(num item);
 };
 }
 #endif

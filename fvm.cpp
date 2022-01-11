@@ -37,20 +37,32 @@ void VM::execute(){
             //htl
             return;
         }
-        else if ((len-1)>curr_index){printf("Invalid optcode %f at %ld\n",op,curr_index+1);exit(1);}
-        if((len-1)<=curr_index){break;}
+        else if ((code.size()-1)>curr_index){printf("Invalid optcode %Lf at %ld\n",op,curr_index+1);exit(1);}
+        if((code.size()-1)<=curr_index){break;}
         advance();
     }
 }
-void VM::add_item(double item){
-    code[len]=item;
-    len++;
+void VM::add_item(num item){
+    code.push_back(item);
 }
 void VM::advance(){
     curr_index++;
     op=code[curr_index];
 }
-
+void VM::write(std::string filename){
+    std::ofstream out(filename, std::ios::binary);
+    for(size_t i=0;i<code.size();++i){
+            out.write(reinterpret_cast<char*>(&code[i]),sizeof(num));
+    }
+    out.close();
+}
+void VM::input(std::string filename){ 
+	std::ifstream r(filename, std::ios::binary);
+	num i=0;
+	while (r.read((char*)&i, sizeof(num))) {
+		code.push_back((num)i);
+	}
+}
 }
 int main(){
     using namespace FVM;
@@ -90,11 +102,15 @@ int main(){
     x.execute();
     assert(x.memory[3]==12);
     std::cout<<x.memory[3]<<"\n";
-    x.advance();
+    // x.advance();
     // x.add_item(OP_EXIT);
     // x.add_item(3);
-    x.add_item(OP_HAULT);
-    x.execute();
-
+    // x.add_item(OP_HAULT);
+    // x.execute();
+    x.write("data.bin");
+    auto y=VM();
+    y.input("data.bin");
+    y.execute();
+    std::cout<<x.memory[3]<<"\n";
     return 0;
 }
