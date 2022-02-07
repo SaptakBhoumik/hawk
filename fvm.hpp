@@ -4,37 +4,66 @@
 #include <cassert>
 #include <vector>
 #include <iostream>
+#include <string>
 namespace FVM{
 typedef long double num;
-/* Opcodes */
-enum opcodes {
-  OP_DEF,//default
-  //Operations with number//
-  OP_MOD,
-  OP_NEG,
-  OP_ADD,  /* add  */
-  OP_SUB,  /* subtract  */
-  OP_DIV,  /* divide  */
-  OP_MUL,  /* multiply  */
-  //********************//
-  OP_MOV,  /*Move a value to an register*/
-  OP_POP,  //Assign the register to 0
-  OP_EXIT,  /*exit*/
-  OP_HAULT  /*hault*/
+enum curr_type{
+    TYPE_NONE,
+    TYPE_NUM,
+    TYPE_LABEL,
+    TYPE_STR
+};
+class TYPE{
+    num m_number=0;
+    std::string m_str;
+    std::vector<TYPE> m_label;
+    curr_type m_type=TYPE_NONE;
+    public:
+    //constructors
+    TYPE();
+    TYPE(num);
+    TYPE(std::string);
+    TYPE(std::vector<TYPE>);
+    //get value
+    curr_type get_type();
+    num get_num();
+    std::string get_str();
+    std::vector<TYPE> get_label();
+    //operators
+    TYPE operator+(TYPE);
+    TYPE operator-(TYPE);
+    TYPE operator*(TYPE);
+    TYPE operator/(TYPE);
+    TYPE operator%(TYPE);
+    TYPE operator^(TYPE);
+    TYPE operator==(TYPE);
+    TYPE operator!=(TYPE);
+    TYPE operator<(TYPE);
+    TYPE operator>(TYPE);
+    TYPE operator<=(TYPE);
+    TYPE operator>=(TYPE);
+    TYPE operator&&(TYPE);
+    TYPE operator||(TYPE);
+    TYPE operator!();
+    TYPE operator&(TYPE);
+    TYPE operator|(TYPE);
+    TYPE operator~();
+    TYPE operator<<(TYPE);
+    TYPE operator>>(TYPE); 
 };
 
 class VM {
     size_t curr_index=0;
-    std::vector<num> code;
-    num op=OP_DEF;
+    std::vector<TYPE> code;
+    TYPE op=TYPE();
     public:
     VM();
     void write(std::string filename);
     void input(std::string filename);
     void advance();
-    num memory[UINT16_MAX];
+    TYPE memory[UINT16_MAX];
     void execute();
-    void add_item(num item);
+    void add_item(TYPE item);
 };
 }
 #endif
