@@ -73,9 +73,8 @@ TYPE TYPE::operator==(TYPE other){
             }
             return 0;
         }
+        return 1;//it is none 
     }
-    else{
-        return 0;
-    }
+    return 0;
 }
 }
