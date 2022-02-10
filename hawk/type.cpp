@@ -1,6 +1,6 @@
-#include "fvm.hpp"
+#include "hawk.hpp"
 
-namespace FVM{
+namespace HAWK{
 TYPE::TYPE(){
     m_type=TYPE_NONE;
 }
@@ -41,7 +41,7 @@ TYPE TYPE::operator-(TYPE other){
     return m_number-other.m_number;
 }
 TYPE TYPE::operator*(TYPE other){
-    return m_number-other.m_number;
+    return m_number*other.m_number;
 }
 TYPE TYPE::operator/(TYPE other){
     return m_number/other.m_number;
@@ -76,5 +76,47 @@ TYPE TYPE::operator==(TYPE other){
         return 1;//it is none 
     }
     return 0;
+}
+TYPE TYPE::operator!=(TYPE other){
+    return !(*this==other);
+}
+TYPE TYPE::operator<(TYPE other){
+    return m_number<other.m_number;
+}
+TYPE TYPE::operator>(TYPE other){
+    return m_number>other.m_number;
+}
+TYPE TYPE::operator<=(TYPE other){
+    return m_number<=other.m_number;
+}
+TYPE TYPE::operator>=(TYPE other){
+    return m_number>=other.m_number;
+}
+TYPE TYPE::operator&&(TYPE other){
+    return (bool)m_number&&(bool)other.m_number;
+}
+TYPE TYPE::operator||(TYPE other){
+    return (bool)m_number||(bool)other.m_number;
+}
+TYPE TYPE::operator!(){
+    return !(bool)m_number;
+}
+TYPE TYPE::operator&(TYPE other){
+    return (int64_t)m_number&(int64_t)other.m_number;
+}
+TYPE TYPE::operator|(TYPE other){
+    return (int64_t)m_number|(int64_t)other.m_number;
+}
+TYPE TYPE::operator~(){
+    return ~(int64_t)m_number;
+}
+TYPE TYPE::operator<<(TYPE other){
+    return (int64_t)m_number<<(int64_t)other.m_number;
+}
+TYPE TYPE::operator>>(TYPE other){
+    return (int64_t)m_number>>(int64_t)other.m_number;
+}
+TYPE TYPE::operator-(){
+    return -m_number;
 }
 }
