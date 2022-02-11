@@ -11,8 +11,13 @@ int main(){
     vm.add_item(OP_LOAD);
     vm.add_item(10);
     vm.add_item(0);
+    vm.add_item(OP_LOAD);
+    vm.add_item({OP_PRINT,1});
+    vm.add_item(1);
     vm.add_item(OP_PRINT);
     vm.add_item(0);
+    vm.add_item(OP_JMP);
+    vm.add_item(1);
     vm.execute();
     return 0;
 }

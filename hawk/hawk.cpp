@@ -2,6 +2,8 @@
 #define advance() i++;curr_data=code[i]
 #define bin_op(op_arg) i++;curr_data=code[i]; auto r1=m_memory[curr_data]; i++;curr_data=code[i]; auto r2=m_memory[curr_data]; i++;curr_data=code[i]; m_memory[curr_data]=r1 op_arg r2
 #define unary_op(op_arg) i++;curr_data=code[i]; auto r1=m_memory[curr_data]; i++;curr_data=code[i];  m_memory[curr_data]= op_arg r1
+#define DISPATCH()  if(i<size){i++;curr_data=code[i];op=(opcode)curr_data.get_num();goto *dispatch[op];}else{return;}
+
 namespace HAWK{
 VM::VM(){}
 VM::VM(std::vector<TYPE> code){
@@ -13,12 +15,9 @@ void VM::execute(){
 void VM::execute(std::vector<TYPE> code){
     size_t size=code.size();
     size_t i=0;
-    TYPE curr_data;
-    opcode op;
-    
-
+    TYPE curr_data=code[i];
+    opcode op=(opcode)curr_data.get_num();
     void* dispatch[END+1]={
-        &&_OP_LOAD,
         &&_OP_LOAD,
         &&_OP_MOV,
         &&_OP_POP,
@@ -49,13 +48,8 @@ void VM::execute(std::vector<TYPE> code){
         &&_OP_EXIT,
         &&_OP_IF,
     };
-    while (i<size){
-        curr_data=code[i];
-        op=(opcode)curr_data.get_num();
-        goto *dispatch[op];
-        i++; 
-    }
-    return;
+        
+    goto *dispatch[op];
     _OP_LOAD:{
         //LOAD <data> <address>
         //Assign <data> to register <address>
@@ -63,6 +57,7 @@ void VM::execute(std::vector<TYPE> code){
         TYPE value=curr_data;
         advance();
         m_memory[curr_data]=value;
+        DISPATCH();
     }
     _OP_MOV:{
         //MOV <address1> <address2>
@@ -71,12 +66,14 @@ void VM::execute(std::vector<TYPE> code){
         TYPE value=m_memory[curr_data];
         advance();
         m_memory[curr_data]=value;
+        DISPATCH();
     }
     _OP_POP:{
         //POP <address>
         //delete the value <address>
         advance();
         m_memory[curr_data]=TYPE();
+        DISPATCH();
     }
     _OP_PRINT:{
         //PRINT <address>
@@ -96,122 +93,142 @@ void VM::execute(std::vector<TYPE> code){
         else{
             std::cout<<"OBJECT<"<<&value<<">"<<"\n";
         }
+        DISPATCH();
     }
     _OP_ADD:{
         //ADD <address1> <address2> <address3>
         //Assign the value of <address1>+<address2> to <address3>
         bin_op(+);
+        DISPATCH();
     }
     _OP_SUB:{
         //SUB <address1> <address2> <address3>
         //Assign the value of <address1>-<address2> to <address3>
         bin_op(-);
+        DISPATCH();
     }
     _OP_NEG:{
         //NEG <address1> <address2>
         //Assign the value of -<address1> to <address2>
         unary_op(-);
+        DISPATCH();
     }
     _OP_MUL:{
         //MUL <address1> <address2> <address3>
         //Assign the value of <address1>*<address2> to <address3>
         bin_op(*);
+        DISPATCH();
     }
     _OP_DIV:{
         //DIV <address1> <address2> <address3>
         //Assign the value of <address1>/<address2> to <address3>
         bin_op(/);
+        DISPATCH();
     }
     _OP_MOD:{
         //MOD <address1> <address2> <address3>
         //Assign the value of <address1>%<address2> to <address3>
         bin_op(%);
+        DISPATCH();
     }
     _OP_BIT_XOR:{
         //BIT_XOR <address1> <address2> <address3>
         //Assign the value of <address1>^<address2> to <address3>
         bin_op(^);
+        DISPATCH();
     }
     _OP_EQ:{
         //EQ <address1> <address2> <address3>
         //Assign the value of <address1>==<address2> to <address3>
         bin_op(==);
+        DISPATCH();
         
     }
     _OP_NEQ:{
         //NEQ <address1> <address2> <address3>
         //Assign the value of <address1>!=<address2> to <address3>
         bin_op(!=);
+        DISPATCH();
         
     }
     _OP_LT:{
         //LT <address1> <address2> <address3>
         //Assign the value of <address1><<address2> to <address3>
         bin_op(<);
+        DISPATCH();
         
     }
     _OP_GT:{
         //GT <address1> <address2> <address3>
         //Assign the value of <address1>><address2> to <address3>
         bin_op(>);
-        
+        DISPATCH();
     }
     _OP_LE:{
         //LE <address1> <address2> <address3>
         //Assign the value of <address1><=<address2> to <address3>
         bin_op(<=);
+        DISPATCH();
         
     }
     _OP_GE:{
         //GE <address1> <address2> <address3>
         //Assign the value of <address1>>=<address2> to <address3>
         bin_op(>=);
-        
+        DISPATCH();       
     }
     _OP_AND:{
         //AND <address1> <address2> <address3>
         //Assign the value of <address1>&&<address2> to <address3>
         bin_op(&&);
+        DISPATCH();
         
     }
     _OP_OR:{
         //OR <address1> <address2> <address3>
         //Assign the value of <address1>||<address2> to <address3>
         bin_op(||);
+        DISPATCH();
         
     }
     _OP_NOT:{
         //NOT <address1> <address2>
         //Assign the value of !<address1> to <address2>
-        unary_op(!);    
+        unary_op(!); 
+        DISPATCH();   
     }
     _OP_BIT_AND:{
         //BIT_AND <address1> <address2> <address3>
         //Assign the value of <address1>&<address2> to <address3>
                 bin_op(&);
+    DISPATCH();
     }
     _OP_BIT_OR:{
         //BIT_OR <address1> <address2> <address3>
         //Assign the value of <address1>|<address2> to <address3>
         bin_op(|);
+        DISPATCH();
         
     }
     _OP_BIT_NOT:{
         //BIT_NOT <address1> <address2>
         //Assign the value of ~<address1> to <address2>
         unary_op(~);
+        DISPATCH();
         
     }
     _OP_SHL:{
         //BIT_SHL <address1> <address2> <address3>
         //Assign the value of <address1><<<address2> to <address3>
         bin_op(<<);
+        DISPATCH();
         
     }
     _OP_SHR:{
         //BIT_SHR <address1> <address2> <address3>
         //Assign the value of <address1>><address2> to <address3>
         bin_op(>>);
+        DISPATCH();
         
     }
     _OP_JMP:{
@@ -219,6 +236,7 @@ void VM::execute(std::vector<TYPE> code){
         //Jump label <address> and execute it
         advance();
         execute(m_memory[curr_data].get_label());
+        DISPATCH();
         
     }
     _OP_RET:{
@@ -256,7 +274,7 @@ void VM::execute(std::vector<TYPE> code){
                 }
             }
         }
-        
+        DISPATCH();
     }
 }
 void VM::add_item(TYPE item){
