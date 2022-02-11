@@ -8,11 +8,12 @@ int main(){
     setrlimit(RLIMIT_STACK, &R);
     using namespace HAWK;
     VM vm;
+   
     vm.add_item(OP_LOAD);
     vm.add_item(10);
     vm.add_item(0);
     vm.add_item(OP_LOAD);
-    vm.add_item({OP_PRINT,1});
+    vm.add_item({OP_PRINT,1,OP_RET});
     vm.add_item(1);
     vm.add_item(OP_PRINT);
     vm.add_item(0);
