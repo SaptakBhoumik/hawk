@@ -60,7 +60,6 @@ class memory{
     memory operator=(memory)=delete;
 };
 typedef enum {
-    OP_NONE,
     OP_LOAD,
     OP_MOV,
     OP_POP,
@@ -90,7 +89,8 @@ typedef enum {
     OP_RET,
     OP_EXIT,
     OP_IF,
-    OP_ELSE
+    OP_ELSE,
+    END,
 }opcode;
 class VM {
     public:
