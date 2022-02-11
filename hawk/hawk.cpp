@@ -47,9 +47,17 @@ void VM::execute(std::vector<TYPE> code){
         &&_OP_RET,
         &&_OP_EXIT,
         &&_OP_IF,
+        &&_OP_ELSE,
+        &&_END
     };
         
     goto *dispatch[op];
+    _OP_ELSE:{ 
+        DISPATCH();
+    }
+    _END: {
+        return;
+    }
     _OP_LOAD:{
         //LOAD <data> <address>
         //Assign <data> to register <address>

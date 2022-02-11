@@ -50,15 +50,7 @@ class TYPE{
     TYPE operator<<(TYPE);
     TYPE operator>>(TYPE); 
 };
-class memory{
-    TYPE m_mem[UINT16_MAX];
-    public:
-    memory()=default;
-    TYPE& operator[](TYPE i){
-        return m_mem[(uint64_t)i.get_num()];
-    }
-    memory operator=(memory)=delete;
-};
+
 typedef enum {
     OP_LOAD,
     OP_MOV,
@@ -93,11 +85,19 @@ typedef enum {
     END,
 }opcode;
 class VM {
+    class memory{
+        TYPE m_mem[UINT16_MAX];
+        public:
+        memory()=default;
+        TYPE& operator[](TYPE i){
+            return m_mem[(uint64_t)i.get_num()];
+        }
+        memory operator=(memory)=delete;
+    } m_memory;
     public:
     std::vector<TYPE> m_code;
     VM();
     VM(std::vector<TYPE> code);
-    memory m_memory;
     void execute(std::vector<TYPE> code);
     void execute();
     void add_item(std::vector<TYPE> item);

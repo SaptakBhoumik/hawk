@@ -18,6 +18,9 @@ int main(){
     vm.add_item(0);
     vm.add_item(OP_JMP);
     vm.add_item(1);
+    vm.add_item(OP_PRINT);
+    vm.add_item(0);
+    vm.add_item(END);
     vm.execute();
     return 0;
 }
