@@ -82,14 +82,22 @@ typedef enum {
     OP_EXIT,
     OP_IF,
     OP_ELSE,
+    OP_IF_NEQ,
+    OP_IF_EQ,
+    OP_IF_LT,
+    OP_IF_GT,
+    OP_IF_LE,
+    OP_IF_GE,
+    OP_IF_AND,
+    OP_IF_OR,
+    OP_IF_NOT,
     END,
 }opcode;
 class VM {
     class memory{
         TYPE m_mem[UINT16_MAX];
         public:
-        memory()=default;
-        TYPE& operator[](TYPE i){
+        inline __attribute__((always_inline)) TYPE& operator[](TYPE i){
             return m_mem[(uint64_t)i.get_num()];
         }
         memory operator=(memory)=delete;

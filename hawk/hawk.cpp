@@ -1,8 +1,74 @@
 #include "hawk.hpp"
+
 #define advance() i++;curr_data=code[i]
-#define bin_op(op_arg) i++;curr_data=code[i]; auto r1=m_memory[curr_data]; i++;curr_data=code[i]; auto r2=m_memory[curr_data]; i++;curr_data=code[i]; m_memory[curr_data]=r1 op_arg r2
-#define unary_op(op_arg) i++;curr_data=code[i]; auto r1=m_memory[curr_data]; i++;curr_data=code[i];  m_memory[curr_data]= op_arg r1
-#define DISPATCH()  if(i<size){i++;curr_data=code[i];op=(opcode)curr_data.get_num();goto *dispatch[op];}else{return;}
+
+#define if_bin_op(curr_operator)i++;curr_data=code[i];\
+        auto r1=m_memory[curr_data];\
+        i++;curr_data=code[i];\
+        auto r2=m_memory[curr_data];\
+        i++;curr_data=code[i];\
+        if((bool)((r1 curr_operator r2).get_num())){\
+            execute(m_memory[curr_data].get_label());\
+            if(i<size-1){\
+                if((opcode)code[i+1].get_num()==OP_ELSE){\
+                    i++;curr_data=code[i];\
+                    i++;curr_data=code[i];\
+                }\
+            }\
+        }\
+        else{\
+            if(i<size-1){\
+               if((opcode)code[i+1].get_num()==OP_ELSE){\
+                    i++;curr_data=code[i];\
+                    i++;curr_data=code[i];\
+                    execute(m_memory[curr_data].get_label());\
+                }\
+            }\
+        }
+#define if_unary_op(curr_operator)i++;curr_data=code[i];\
+        auto r1=m_memory[curr_data];\
+        i++;curr_data=code[i];\
+        if((bool)((curr_operator r1).get_num())){\
+            execute(m_memory[curr_data].get_label());\
+            if(i<size-1){\
+                if((opcode)code[i+1].get_num()==OP_ELSE){\
+                    i++;curr_data=code[i];\
+                    i++;curr_data=code[i];\
+                }\
+            }\
+        }\
+        else{\
+            if(i<size-1){\
+               if((opcode)code[i+1].get_num()==OP_ELSE){\
+                    i++;curr_data=code[i];\
+                    i++;curr_data=code[i];\
+                    execute(m_memory[curr_data].get_label());\
+                }\
+            }\
+        }
+#define bin_op(op_arg) i++;\
+                        curr_data=code[i];\
+                        auto r1=m_memory[curr_data];\
+                        i++;\
+                        curr_data=code[i];\
+                        auto r2=m_memory[curr_data];\
+                        i++;\
+                        curr_data=code[i];\
+                        m_memory[curr_data]=r1 op_arg r2
+
+
+#define unary_op(op_arg) i++;\
+                        curr_data=code[i];\
+                        auto r1=m_memory[curr_data];\
+                        i++;\
+                        curr_data=code[i];\
+                        m_memory[curr_data]= op_arg r1
+
+#define DISPATCH()  {\
+                    curr_data=code[++i];\
+                    op=(opcode)curr_data.get_num();\
+                    goto *dispatch[op];\
+                    }
 
 namespace HAWK{
 VM::VM(){}
@@ -48,13 +114,61 @@ void VM::execute(std::vector<TYPE> code){
         &&_OP_EXIT,
         &&_OP_IF,
         &&_OP_ELSE,
+        &&_OP_IF_NEQ,
+        &&_OP_IF_EQ,
+        &&_OP_IF_LT,
+        &&_OP_IF_GT,
+        &&_OP_IF_LE,
+        &&_OP_IF_GE,
+        &&_OP_IF_AND,
+        &&_OP_IF_OR,
+        &&_OP_IF_NOT,
         &&_END
     };
         
     goto *dispatch[op];
-    _OP_ELSE:{ 
+    _OP_IF_NOT:{
+        if_unary_op(!);
         DISPATCH();
     }
+    _OP_IF_NEQ:{
+        if_bin_op(!=);
+        DISPATCH();
+    }
+    _OP_IF_EQ:{
+        if_bin_op(==);
+        DISPATCH();
+    }
+    _OP_IF_LT:{
+        if_bin_op(<);
+        DISPATCH();
+    }
+    _OP_IF_GT:{
+        if_bin_op(>);
+        DISPATCH();
+    }
+    _OP_IF_LE:{
+        if_bin_op(<=);
+        DISPATCH();
+    }
+    _OP_IF_GE:{
+        if_bin_op(>=);
+        DISPATCH();
+    }
+    _OP_IF_AND:{
+        if_bin_op(&&);
+        DISPATCH();
+    }
+    _OP_IF_OR:{
+        if_bin_op(||);
+        DISPATCH();
+    }
+
+    _OP_ELSE:{ 
+        std::cout<<"Error: else without a previous if op";
+        exit(1);
+    }
+    
     _END: {
         return;
     }
