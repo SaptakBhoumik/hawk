@@ -3,7 +3,7 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
-typedef long double num;
+typedef double num;
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

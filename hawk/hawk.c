@@ -1,74 +1,73 @@
 #include "hawk.h"
 #define bin_op(op_arg)  {\
-                    i++;\
-                    curr_data=code[i];\
+                    code++;\
+                    curr_data=*code;\
                     num r1=m_memory[(uint64_t)curr_data.number].number;\
-                    i++;\
-                    curr_data=code[i];\
+                    code++;\
+                    curr_data=*code;\
                     num r2=m_memory[(uint64_t)curr_data.number].number;\
-                    i++;\
-                    curr_data=code[i];\
+                    code++;\
+                    curr_data=*code;\
                     m_memory[(uint64_t)curr_data.number]=(HawkType){.type=TYPE_NUM,.number=r1 op_arg r2};\
                     }
 
-#define if_bin_op(curr_operator)i++;curr_data=code[i];\
+#define if_bin_op(curr_operator)code++;curr_data=*code;\
         HawkType r1=m_memory[(uint64_t)curr_data.number];\
-        i++;curr_data=code[i];\
+        code++;curr_data=*code;\
         HawkType r2=m_memory[(uint64_t)curr_data.number];\
-        i++;curr_data=code[i];\
+        code++;curr_data=*code;\
         if((int)(r1.number curr_operator r2.number)){\
             execute(m_memory[(uint64_t)curr_data.number].label);\
-            if((opcode)code[i+1].number==OP_ELSE){\
-                i++;curr_data=code[i];\
-                i++;curr_data=code[i];\
+            if((opcode)(*(code+1)).number==OP_ELSE){\
+                code++;curr_data=*code;\
+                code++;curr_data=*code;\
             }\
         }\
         else{\
-            if((opcode)code[i+1].number==OP_ELSE){\
-                i++;curr_data=code[i];\
-                i++;curr_data=code[i];\
+            if((opcode)(*(code+1)).number==OP_ELSE){\
+                code++;curr_data=*code;\
+                code++;curr_data=*code;\
                 execute(m_memory[(uint64_t)curr_data.number].label);\
             }\
         }
 
-#define unary_op(op_arg) i++;\
-                        curr_data=code[i];\
+#define unary_op(op_arg) code++;\
+                        curr_data=*code;\
                         num r1=m_memory[(uint64_t)curr_data.number].number;\
-                        i++;\
-                        curr_data=code[i];\
+                        code++;\
+                        curr_data=*code;\
                         m_memory[(uint64_t)curr_data.number]=(HawkType){.type=TYPE_NUM,.number=op_arg r1};
 
-#define unary_int_op(op_arg) i++;\
-                        curr_data=code[i];\
+#define unary_int_op(op_arg) code++;\
+                        curr_data=*code;\
                         uint64_t r1=(uint64_t)m_memory[(uint64_t)curr_data.number].number;\
-                        i++;\
-                        curr_data=code[i];\
+                        code++;\
+                        curr_data=*code;\
                         m_memory[(uint64_t)curr_data.number]=(HawkType){.type=TYPE_NUM,.number=op_arg r1};
 
 
 #define bin_int_op(op_arg)  {\
-                    i++;\
-                    curr_data=code[i];\
+                    code++;\
+                    curr_data=*code;\
                     uint64_t r1=(uint64_t)m_memory[(uint64_t)curr_data.number].number;\
-                    i++;\
-                    curr_data=code[i];\
+                    code++;\
+                    curr_data=*code;\
                     uint64_t r2=(uint64_t)m_memory[(uint64_t)curr_data.number].number;\
-                    i++;\
-                    curr_data=code[i];\
+                    code++;\
+                    curr_data=*code;\
                     m_memory[(uint64_t)curr_data.number]=(HawkType){.type=TYPE_NUM,.number=r1 op_arg r2};\
                     }
 
-#define advance() i++;curr_data=code[i]
+#define advance() code++;curr_data=*code
 #define DISPATCH()  {\
-                    curr_data=code[++i];\
+                    code++;curr_data=*code;\
                     op=(opcode)curr_data.number;\
                     goto *dispatch[op];\
                     }
 void execute(HawkType* code){
     static HawkType m_memory[UINT16_MAX];
-    uint64_t i=0;
-    opcode op=(opcode)code[i].number;
-    HawkType curr_data=code[i];
+    opcode op=(opcode)code[0].number;
+    HawkType curr_data=code[0];
     void* dispatch[END+1]={
         &&_OP_LOAD,
         &&_OP_MOV,
@@ -151,14 +150,14 @@ void execute(HawkType* code){
         if((int)m_memory[(uint64_t)curr_data.number].number){
             advance();
             execute(m_memory[(uint64_t)curr_data.number].label);
-            if((opcode)code[i+1].number==OP_ELSE){
+            if((opcode)(*(code+1)).number==OP_ELSE){
                 advance();
                 advance();
             }
         }
         else{
             advance();
-            if((opcode)code[i+1].number==OP_ELSE){
+            if((opcode)(*(code+1)).number==OP_ELSE){
                 advance();
                 advance();
                 execute(m_memory[(uint64_t)curr_data.number].label);
@@ -211,7 +210,7 @@ void execute(HawkType* code){
         advance();
         HawkType data=m_memory[(uint64_t)curr_data.number];
         if(data.type==TYPE_NUM){
-            printf("%Lf\n",data.number);
+            printf("%f\n",data.number);
         }
         else if(data.type==TYPE_NONE){
             printf("None\n");
