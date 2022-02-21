@@ -24,7 +24,7 @@ typedef enum {
     OP_LOAD,
     OP_MOV,
     OP_POP,
-    OP_PRINT,
+    OP_PRINT_INT,
     OP_ADD,
     OP_SUB,
     OP_NEG,
