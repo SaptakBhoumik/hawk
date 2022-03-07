@@ -4,9 +4,7 @@
 extern "C" {
 #endif
 typedef double num;
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#define MAX_LIMIT 65535
 enum curr_type{
     TYPE_NONE=0,
     TYPE_NUM=1,
@@ -17,6 +15,7 @@ enum curr_type{
 struct _HawkType{
     enum curr_type type;
     num number;
+    void* jmp_loc;
     struct _HawkType* label;
 };
 typedef struct _HawkType HawkType; 
@@ -59,9 +58,8 @@ typedef enum {
     OP_IF_GE,
     OP_IF_AND,
     OP_IF_OR,
-    END,
 }opcode;
-void execute(HawkType*);
+void execute(HawkType*,HawkType*);
 #if defined(__cplusplus)
 }
 #endif

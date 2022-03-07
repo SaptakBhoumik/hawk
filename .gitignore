@@ -4,4 +4,5 @@
 *.out
 *.bin
 test.*
+test
 test*.*
