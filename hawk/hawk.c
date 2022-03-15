@@ -1,4 +1,4 @@
-#include "hawk.h"
+#include "hawk.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #define bin_op(op_arg)  {\
@@ -16,7 +16,7 @@
         HawkType r2=m_memory[(long long)code->number];\
         code++;\
         if((int)(r1.number curr_operator r2.number)){\
-            execute(m_memory[(long long)code->number].label,m_memory);\
+            __execute(m_memory[(long long)code->number].label,m_memory);\
             if((opcode)(*(code+1)).number==OP_ELSE){\
                 code++;\
                 code++;\
@@ -26,7 +26,7 @@
             if((opcode)(*(code+1)).number==OP_ELSE){\
                 code++;\
                 code++;\
-                execute(m_memory[(long long)code->number].label,m_memory);\
+                __execute(m_memory[(long long)code->number].label,m_memory);\
             }\
         }
 
@@ -60,7 +60,7 @@
                     code+=size;\
                     goto *dispatch[(opcode)code->number];\
                     }
-void execute(HawkType* code,HawkType* m_memory){
+void __execute(HawkType* code,HawkType* m_memory){
     void* dispatch[]={
         &&_OP_LOAD,
         &&_OP_MOV,
@@ -141,7 +141,7 @@ void execute(HawkType* code,HawkType* m_memory){
         advance();
         if((int)m_memory[(long long)code->number].number){
             advance();
-            execute(m_memory[(long long)code->number].label,m_memory);
+            __execute(m_memory[(long long)code->number].label,m_memory);
             if((opcode)(*(code+1)).number==OP_ELSE){
                 advance();
                 advance();
@@ -152,7 +152,7 @@ void execute(HawkType* code,HawkType* m_memory){
             if((opcode)(*(code+1)).number==OP_ELSE){
                 advance();
                 advance();
-                execute(m_memory[(long long)code->number].label,m_memory);
+                __execute(m_memory[(long long)code->number].label,m_memory);
             }
         }
         DISPATCH();
@@ -334,7 +334,7 @@ void execute(HawkType* code,HawkType* m_memory){
         //JMP <address>
         //Jump to <address>
         advance();
-        execute(m_memory[(long long)code->number].label,m_memory);
+        __execute(m_memory[(long long)code->number].label,m_memory);
         DISPATCH();
     }
 }

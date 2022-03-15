@@ -59,8 +59,17 @@ typedef enum {
     OP_IF_AND,
     OP_IF_OR,
 }opcode;
-void execute(HawkType*,HawkType*);
 #if defined(__cplusplus)
+};
+namespace HAWK_VM {
+class HAWK{
+    HawkType* m_code=nullptr,*m_memory=nullptr;
+    public:
+        HAWK();
+        HAWK(HawkType* code,HawkType* memory);
+        void execute();
+        void execute(HawkType* code,HawkType* memory);
+};
 }
 #endif
 #endif
