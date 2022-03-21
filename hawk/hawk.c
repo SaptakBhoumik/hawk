@@ -55,53 +55,106 @@
                     code++;\
                     goto *dispatch[(opcode)code->number];\
                     }
-#define PREPARE(name,size){\
-                    code->number=(num)&&_OP_#name;\
-                    code+=size;\
-                    goto *dispatch[(opcode)code->number];\
-                    }
+#define insert(op) [OP_##op] = &&_OP_##op
+
+int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
+    int res=0;
+    for(long long i=0;i<size1;i++){
+        if(array2[i].type==TYPE_ARRAY){
+           res=equality_array(array1[i].array,array1[i].size,array2[i].array,array2[i].size);
+           if(!res){
+                res = 0;
+                break;
+           } 
+        }
+        else if(array1[i].number!=array2[i].number){
+            res=0;
+            break;
+        }
+        else{
+            res=1;
+        }
+    }
+    return res;
+}
+
 void __execute(HawkType* code,HawkType* m_memory){
     void* dispatch[]={
-        &&_OP_LOAD,
-        &&_OP_MOV,
-        &&_OP_POP,
-        &&_OP_PRINT_INT,
-        &&_OP_ADD,
-        &&_OP_SUB,
-        &&_OP_NEG,
-        &&_OP_MUL,
-        &&_OP_DIV,
-        &&_OP_MOD,
-        &&_OP_BIT_XOR,
-        &&_OP_EQ,
-        &&_OP_NEQ,
-        &&_OP_LT,
-        &&_OP_GT,
-        &&_OP_LE,
-        &&_OP_GE,
-        &&_OP_AND,
-        &&_OP_OR,
-        &&_OP_NOT,
-        &&_OP_BIT_AND,
-        &&_OP_BIT_OR,
-        &&_OP_BIT_NOT,
-        &&_OP_SHL,
-        &&_OP_SHR,
-        &&_OP_JMP,
-        &&_OP_RET,
-        &&_OP_EXIT,
-        &&_OP_IF,
-        &&_OP_ELSE,
-        &&_OP_IF_NEQ,
-        &&_OP_IF_EQ,
-        &&_OP_IF_LT,
-        &&_OP_IF_GT,
-        &&_OP_IF_LE,
-        &&_OP_IF_GE,
-        &&_OP_IF_AND,
-        &&_OP_IF_OR,
+        insert(LOAD),
+        insert(MOV),
+        insert(POP),
+        insert(ADD),
+        insert(SUB),
+        insert(NEG),
+        insert(MUL),
+        insert(DIV),
+        insert(MOD),
+        insert(BIT_XOR),
+        insert(EQ),
+        insert(NEQ),
+        insert(LT),
+        insert(GT),
+        insert(LE),
+        insert(GE),
+        insert(AND),
+        insert(OR),
+        insert(NOT),
+        insert(BIT_AND),
+        insert(BIT_OR),
+        insert(BIT_NOT),
+        insert(SHL),
+        insert(SHR),
+        insert(JMP),
+        insert(RET),
+        insert(EXIT),
+        insert(IF),
+        insert(ELSE),
+        insert(IF_NEQ),
+        insert(IF_EQ),
+        insert(IF_LT),
+        insert(IF_GT),
+        insert(IF_LE),
+        insert(IF_GE),
+        insert(IF_AND),
+        insert(IF_OR),
+        insert(EQ_ARRAY),
+        insert(INSERT),
+        insert(APPEND),
     };
     goto *dispatch[(opcode)code->number];
+    _OP_INSERT:{
+        advance();
+        HawkType r1=m_memory[(long long)code->number];
+        advance();
+        HawkType r2=m_memory[(long long)code->number];
+        advance();
+        m_memory[(long long)code->number].array[(long long)r2.number]=r1;
+        DISPATCH();
+    }
+    _OP_APPEND:{
+        advance();
+        HawkType r1=m_memory[(long long)code->number];
+        advance();
+        HawkType* arr=&m_memory[(long long)code->number];
+        arr->array[(long long)arr->size]=r1;
+        arr->size++;
+        DISPATCH();
+    }
+    _OP_EQ_ARRAY:{
+        advance();
+        HawkType* array1=m_memory[(long long)code->number].array;
+        num size1=m_memory[(long long)code->number].size;
+        advance();
+        HawkType* array2=m_memory[(long long)code->number].array;
+        num size2=m_memory[(long long)code->number].size;
+        advance();
+        int res=0;
+        if(size1==size2){
+            res=equality_array(array1,size1,array2,size2);
+        }
+        m_memory[(long long)code->number]=(HawkType){.type=TYPE_NUM,.number=res};
+        DISPATCH();
+    }
     _OP_IF_NEQ:{
         if_bin_op(!=);
         DISPATCH();
@@ -157,9 +210,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         }
         DISPATCH();
     }
-    _OP_RET:{
-        return;
-    }
+    
     _OP_ELSE:{
         printf("Error: else without a previous if op\n");
         exit(1);
@@ -192,14 +243,6 @@ void __execute(HawkType* code,HawkType* m_memory){
         //delete the value <address>
         advance();
         m_memory[(long long)code->number]=(HawkType){.type=TYPE_NONE,.number=0};
-        DISPATCH();
-    }
-    _OP_PRINT_INT:{
-        //PRINT <address>
-        //print the value <address>
-        advance();
-        HawkType data=m_memory[(long long)code->number];
-        printf("%f\n",data.number);
         DISPATCH();
     }
     _OP_ADD:{
@@ -336,5 +379,8 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         __execute(m_memory[(long long)code->number].label,m_memory);
         DISPATCH();
+    }
+    _OP_RET:{
+        return;
     }
 }

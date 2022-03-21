@@ -6,24 +6,28 @@ extern "C" {
 typedef double num;
 #define MAX_LIMIT 65535
 enum curr_type{
-    TYPE_NONE=0,
-    TYPE_NUM=1,
-    TYPE_LABEL=2,
-    TYPE_STR=3
+    TYPE_NONE,
+    TYPE_NUM,
+    TYPE_LABEL,
+    TYPE_ARRAY
 };
 
 struct _HawkType{
     enum curr_type type;
-    num number;
-    void* jmp_loc;
-    struct _HawkType* label;
+    union{
+        num number;
+        struct _HawkType* label;
+        struct{ 
+            struct _HawkType* array;
+            num size;
+        };
+    };
 };
 typedef struct _HawkType HawkType; 
 typedef enum {
     OP_LOAD,
     OP_MOV,
     OP_POP,
-    OP_PRINT_INT,
     OP_ADD,
     OP_SUB,
     OP_NEG,
@@ -58,6 +62,9 @@ typedef enum {
     OP_IF_GE,
     OP_IF_AND,
     OP_IF_OR,
+    OP_EQ_ARRAY,
+    OP_INSERT,
+    OP_APPEND,
 }opcode;
 #if defined(__cplusplus)
 };
@@ -65,10 +72,10 @@ namespace HAWK_VM {
 class HAWK{
     HawkType* m_code=nullptr,*m_memory=nullptr;
     public:
-        HAWK();
-        HAWK(HawkType* code,HawkType* memory);
-        void execute();
-        void execute(HawkType* code,HawkType* memory);
+        HAWK() noexcept;
+        HAWK(HawkType* code,HawkType* memory) noexcept;
+        void execute() noexcept;
+        void execute(HawkType* code,HawkType* memory) noexcept;
 };
 }
 #endif
