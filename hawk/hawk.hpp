@@ -29,7 +29,6 @@ struct HawkType{
 typedef enum {
     OP_LOAD,
     OP_MOV,
-    OP_POP,
     OP_ADD,
     OP_SUB,
     OP_NEG,

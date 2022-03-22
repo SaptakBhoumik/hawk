@@ -96,9 +96,10 @@ int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
     }
     return res;
 }
-char* to_str(HawkType item){
+inline char* to_str(HawkType item){
     char* res=malloc(sizeof(char)*(item.size+1));
     for(long long i=0;i<item.size;i++){
+        if(item.array[i].type!=TYPE_NUM){break;}
         res[i]=item.array[i].number;
     }
     res[(long long)item.size]='\0';
@@ -108,7 +109,6 @@ void __execute(HawkType* code,HawkType* m_memory){
     void* dispatch[]={
         insert(LOAD),
         insert(MOV),
-        insert(POP),
         insert(ADD),
         insert(SUB),
         insert(NEG),
@@ -158,6 +158,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         insert(CREALOC),
         insert(DL_OPEN),
         insert(DL_CLOSE),
+        insert(DL_CALL),
     };
     goto *dispatch[(opcode)code->number];
     
@@ -349,13 +350,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         m_memory[(long long)address.number]=m_memory[(long long)code->number];
         DISPATCH();
     }    
-    _OP_POP:{
-        //POP <address>
-        //delete the value <address>
-        advance();
-        m_memory[(long long)code->number]=(HawkType){.type=TYPE_NONE,.number=0};
-        DISPATCH();
-    }
+    
     _OP_ADD:{
         //ADD <address> <address> <address>
         //Assign <address> to <address> + <address>
@@ -495,28 +490,30 @@ void __execute(HawkType* code,HawkType* m_memory){
     _OP_DL_OPEN:{
         advance();
         HawkType r1=m_memory[(long long)code->number];
-        advance();
         char* r1_str=to_str(r1);
+        advance();
         m_memory[(long long)code->number].so = dlopen(r1_str, RTLD_NOW);     
         free(r1_str);
+        r1_str=NULL;
         DISPATCH();
-    }
-    _OP_RET:{
-        return;
-    }
+    }  
     _OP_DL_CLOSE:{
         advance();
         dlclose(m_memory[(long long)code->number].so);     
         DISPATCH();
     }
-    OP_DL_CALL:{
+    _OP_DL_CALL:{
         advance();
         char* r1=to_str(m_memory[(long long)code->number]);
         advance();
         ext_func func = dlsym(m_memory[(long long)code->number].so, r1);
         free(r1);
+        r1=NULL;
         advance();
-        func(m_memory[(long long)code->number],m_memory);
+        (*func)(m_memory[(long long)code->number],m_memory);
         DISPATCH();
+    }
+    _OP_RET:{
+        return;
     }
 }
