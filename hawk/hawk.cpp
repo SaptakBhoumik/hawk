@@ -1,4 +1,4 @@
-#include "hawk.hpp"
+#include "../include/hawk.hpp"
 extern "C" void __execute(HawkType* code,HawkType* m_memory) noexcept;
 namespace HAWK_VM {
 HAWK::HAWK() noexcept{

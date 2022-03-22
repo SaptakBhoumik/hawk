@@ -1,4 +1,4 @@
-#include "hawk.hpp"
+#include "../include/hawk.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #if defined _WIN32 || defined __CYGWIN__
