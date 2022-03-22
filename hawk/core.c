@@ -21,7 +21,7 @@
         HawkType r2=m_memory[(long long)code->number];\
         code++;\
         if((int)(r1.number curr_operator r2.number)){\
-            __execute(m_memory[(long long)code->number].label,m_memory);\
+            __execute(m_memory[(long long)code->number].array,m_memory);\
             if((opcode)(*(code+1)).number==OP_ELSE){\
                 code++;\
                 code++;\
@@ -31,7 +31,7 @@
             if((opcode)(*(code+1)).number==OP_ELSE){\
                 code++;\
                 code++;\
-                __execute(m_memory[(long long)code->number].label,m_memory);\
+                __execute(m_memory[(long long)code->number].array,m_memory);\
             }\
         }
 
@@ -306,7 +306,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         if((int)m_memory[(long long)code->number].number){
             advance();
-            __execute(m_memory[(long long)code->number].label,m_memory);
+            __execute(m_memory[(long long)code->number].array,m_memory);
             if((opcode)(*(code+1)).number==OP_ELSE){
                 advance();
                 advance();
@@ -317,7 +317,7 @@ void __execute(HawkType* code,HawkType* m_memory){
             if((opcode)(*(code+1)).number==OP_ELSE){
                 advance();
                 advance();
-                __execute(m_memory[(long long)code->number].label,m_memory);
+                __execute(m_memory[(long long)code->number].array,m_memory);
             }
         }
         DISPATCH();
@@ -483,7 +483,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         //JMP <address>
         //Jump to <address>
         advance();
-        __execute(m_memory[(long long)code->number].label,m_memory);
+        __execute(m_memory[(long long)code->number].array,m_memory);
         DISPATCH();
     }
     //TODO: WINDOWS

@@ -10,7 +10,8 @@ enum curr_type{
     TYPE_NUM,
     TYPE_LABEL,
     TYPE_ARRAY,
-    TYPE_PTR
+    TYPE_PTR,
+    TYPE_OP
 };
 
 struct HawkType{
@@ -19,7 +20,6 @@ struct HawkType{
         num number;
         void *so;
         struct HawkType* PTR;
-        struct HawkType* label;
         struct{ 
             struct HawkType* array;
             num size;
