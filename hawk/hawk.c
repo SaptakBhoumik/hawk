@@ -1,6 +1,11 @@
 #include "hawk.hpp"
 #include <stdio.h>
 #include <stdlib.h>
+#if defined _WIN32 || defined __CYGWIN__
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 #define bin_op(op_arg)  {\
                     code++;\
                     num r1=m_memory[(long long)code->number].number;\
@@ -57,6 +62,8 @@
                     }
 #define insert(op) [OP_##op] = &&_OP_##op
 
+typedef struct HawkType HawkType;
+typedef void (*ext_func)(HawkType ,HawkType*);
 int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
     int res=0;
     for(long long i=0;i<size1;i++){
@@ -66,6 +73,18 @@ int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
                 res = 0;
                 break;
            } 
+        }
+        else if(array2[i].type==TYPE_PTR){
+            if(array1[i].PTR!=array2[i].PTR){
+                res=0;
+                break;
+            }
+            else{
+                res=1;
+            }
+        }
+        else if(TYPE_NONE==array2[i].type==array1[i].type){
+            res=1;
         }
         else if(array1[i].number!=array2[i].number){
             res=0;
@@ -77,7 +96,14 @@ int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
     }
     return res;
 }
-
+char* to_str(HawkType item){
+    char* res=malloc(sizeof(char)*(item.size+1));
+    for(long long i=0;i<item.size;i++){
+        res[i]=item.array[i].number;
+    }
+    res[(long long)item.size]='\0';
+    return res;
+}
 void __execute(HawkType* code,HawkType* m_memory){
     void* dispatch[]={
         insert(LOAD),
@@ -120,8 +146,93 @@ void __execute(HawkType* code,HawkType* m_memory){
         insert(EQ_ARRAY),
         insert(INSERT),
         insert(APPEND),
+        insert(MALLOC),
+        insert(FREE),
+        insert(REALOC),
+        insert(LEN),
+        insert(GETPTR),
+        insert(LDPTR_VAL),
+        insert(ASPTR_VAL),
+        insert(AT),
+        insert(CMALLOC),
+        insert(CREALOC),
+        insert(DL_OPEN),
+        insert(DL_CLOSE),
     };
     goto *dispatch[(opcode)code->number];
+    
+    _OP_AT:{
+        advance();
+        HawkType r1=m_memory[(long long)code->number];
+        advance();
+        HawkType r2=m_memory[(long long)code->number];
+        advance();
+        m_memory[(long long)code->number]=r1.array[(long long)r2.number];
+        DISPATCH();
+    }
+    _OP_ASPTR_VAL:{
+        advance();
+        HawkType* ptr=m_memory[(long long)code->number].PTR;
+        advance();
+        *ptr=m_memory[(long long)code->number];
+        DISPATCH();
+    }
+    _OP_LDPTR_VAL:{
+        advance();
+        HawkType* ptr=m_memory[(long long)code->number].PTR;
+        advance();
+        m_memory[(long long)code->number]=*ptr;
+        DISPATCH();
+    }
+    _OP_GETPTR:{
+        advance();
+        num index=m_memory[(long long)code->number].number;
+        advance();
+        m_memory[(long long)code->number].PTR=&m_memory[(long long)index];
+        DISPATCH();
+    }
+    _OP_LEN:{
+        advance();
+        HawkType array=m_memory[(long long)code->number];
+        advance();
+        m_memory[(long long)code->number]=(HawkType){.type=TYPE_NUM,.number=array.size};
+        DISPATCH();
+    }
+    _OP_FREE:{
+        advance();
+        free(m_memory[(long long)code->number].array);
+        m_memory[(long long)code->number].array=NULL;
+        m_memory[(long long)code->number].size=0;
+        DISPATCH();        
+    }
+    _OP_MALLOC:{
+        advance();
+        num size=m_memory[(long long)code->number].number;
+        advance();
+        m_memory[(long long)code->number].array=malloc(size);
+        DISPATCH();
+    }
+    _OP_REALOC:{
+        advance();
+        num size=m_memory[(long long)code->number].number;
+        advance();
+        m_memory[(long long)code->number].array=realloc(m_memory[(long long)code->number].array,size);
+        DISPATCH();
+    }
+    _OP_CMALLOC:{
+        advance();
+        num size=code->number;
+        advance();
+        m_memory[(long long)code->number].array=malloc(size);
+        DISPATCH();
+    }
+    _OP_CREALOC:{
+        advance();
+        num size=code->number;
+        advance();
+        m_memory[(long long)code->number].array=realloc(m_memory[(long long)code->number].array,size);
+        DISPATCH();
+    }
     _OP_INSERT:{
         advance();
         HawkType r1=m_memory[(long long)code->number];
@@ -380,7 +491,32 @@ void __execute(HawkType* code,HawkType* m_memory){
         __execute(m_memory[(long long)code->number].label,m_memory);
         DISPATCH();
     }
+    //TODO: WINDOWS
+    _OP_DL_OPEN:{
+        advance();
+        HawkType r1=m_memory[(long long)code->number];
+        advance();
+        char* r1_str=to_str(r1);
+        m_memory[(long long)code->number].so = dlopen(r1_str, RTLD_NOW);     
+        free(r1_str);
+        DISPATCH();
+    }
     _OP_RET:{
         return;
+    }
+    _OP_DL_CLOSE:{
+        advance();
+        dlclose(m_memory[(long long)code->number].so);     
+        DISPATCH();
+    }
+    OP_DL_CALL:{
+        advance();
+        char* r1=to_str(m_memory[(long long)code->number]);
+        advance();
+        ext_func func = dlsym(m_memory[(long long)code->number].so, r1);
+        free(r1);
+        advance();
+        func(m_memory[(long long)code->number],m_memory);
+        DISPATCH();
     }
 }

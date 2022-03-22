@@ -9,21 +9,23 @@ enum curr_type{
     TYPE_NONE,
     TYPE_NUM,
     TYPE_LABEL,
-    TYPE_ARRAY
+    TYPE_ARRAY,
+    TYPE_PTR
 };
 
-struct _HawkType{
+struct HawkType{
     enum curr_type type;
     union{
         num number;
-        struct _HawkType* label;
+        void *so;
+        struct HawkType* PTR;
+        struct HawkType* label;
         struct{ 
-            struct _HawkType* array;
+            struct HawkType* array;
             num size;
         };
     };
 };
-typedef struct _HawkType HawkType; 
 typedef enum {
     OP_LOAD,
     OP_MOV,
@@ -65,6 +67,19 @@ typedef enum {
     OP_EQ_ARRAY,
     OP_INSERT,
     OP_APPEND,
+    OP_MALLOC,
+    OP_FREE,
+    OP_REALOC,
+    OP_LEN,
+    OP_GETPTR,
+    OP_LDPTR_VAL,
+    OP_ASPTR_VAL,
+    OP_AT,
+    OP_CMALLOC,
+    OP_CREALOC,
+    OP_DL_OPEN,
+    OP_DL_CLOSE,
+    OP_DL_CALL,
 }opcode;
 #if defined(__cplusplus)
 };
