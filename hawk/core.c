@@ -486,27 +486,39 @@ void __execute(HawkType* code,HawkType* m_memory){
         __execute(m_memory[(long long)code->number].array,m_memory);
         DISPATCH();
     }
-    //TODO: WINDOWS
+
     _OP_DL_OPEN:{
         advance();
         HawkType r1=m_memory[(long long)code->number];
         char* r1_str=to_str(r1);
         advance();
-        m_memory[(long long)code->number].so = dlopen(r1_str, RTLD_NOW);     
+        #if defined _WIN32 || defined __CYGWIN__
+        m_memory[(long long)code->number].so = LoadLibrary(r1_str);   
+        #else
+        m_memory[(long long)code->number].so = dlopen(r1_str, RTLD_NOW);   
+        #endif  
         free(r1_str);
         r1_str=NULL;
         DISPATCH();
     }  
     _OP_DL_CLOSE:{
         advance();
-        dlclose(m_memory[(long long)code->number].so);     
+        #if defined _WIN32 || defined __CYGWIN__
+        FreeLibrary(m_memory[(long long)code->number].so);   
+        #else
+        dlclose(m_memory[(long long)code->number].so); 
+        #endif    
         DISPATCH();
     }
     _OP_DL_CALL:{
         advance();
         char* r1=to_str(m_memory[(long long)code->number]);
         advance();
+        #if defined _WIN32 || defined __CYGWIN__
+        ext_func func = GetProcAddress(m_memory[(long long)code->number].so, r1);
+        #else
         ext_func func = dlsym(m_memory[(long long)code->number].so, r1);
+        #endif
         free(r1);
         r1=NULL;
         advance();

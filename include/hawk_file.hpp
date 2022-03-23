@@ -3,6 +3,7 @@
 #include "hawk.hpp"
 #include <fstream>
 #include <string>
+#include <vector>
 namespace HAWK_VM{
 class HAWK_FILE{
     std::string m_filename="";
@@ -10,6 +11,7 @@ class HAWK_FILE{
     size_t m_size=0;
     std::ofstream m_output_file;
     std::ifstream m_read_file;
+    std::vector<size_t> to_clear;
     void write(HawkType*,size_t);
     void read(HawkType*,size_t);
     public:
@@ -18,6 +20,7 @@ class HAWK_FILE{
     HAWK_FILE(std::string);
     void write(HawkType*,size_t,std::string);
     void write();
+    void clean_up();
     HawkType* read(std::string);
     HawkType* read();
 };
