@@ -77,8 +77,10 @@ void HAWK_FILE::read(HawkType* code,size_t size){
 void HAWK_FILE::clean_up(){
     if(m_code!=NULL){
         for(auto&i:to_clear){
-            free(m_code[i].array);
-            m_code[i].array=NULL;
+            if(m_code[i].array!=NULL) {
+                free(m_code[i].array);
+                m_code[i].array=NULL;
+            }
         }
         free(m_code);
         m_code=NULL;
