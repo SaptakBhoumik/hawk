@@ -11,7 +11,7 @@ class HAWK_FILE{
     size_t m_size=0;
     std::ofstream m_output_file;
     std::ifstream m_read_file;
-    std::vector<size_t> to_clear;
+    std::vector<HawkType**> to_clear;
     void write(HawkType*,size_t);
     void read(HawkType*,size_t);
     public:

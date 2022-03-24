@@ -67,7 +67,7 @@ typedef void (*ext_func)(HawkType ,HawkType*);
 int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
     int res=0;
     for(long long i=0;i<size1;i++){
-        if(array2[i].type==TYPE_ARRAY){
+        if(array2[i].type==TYPE_ARRAY||array2[i].type==TYPE_STR){
            res=equality_array(array1[i].array,array1[i].size,array2[i].array,array2[i].size);
            if(!res){
                 res = 0;
@@ -82,9 +82,6 @@ int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
             else{
                 res=1;
             }
-        }
-        else if(TYPE_NONE==array2[i].type==array1[i].type){
-            res=1;
         }
         else if(array1[i].number!=array2[i].number){
             res=0;
@@ -132,7 +129,6 @@ void __execute(HawkType* code,HawkType* m_memory){
         insert(SHR),
         insert(JMP),
         insert(RET),
-        insert(EXIT),
         insert(IF),
         insert(ELSE),
         insert(IF_NEQ),
@@ -327,10 +323,6 @@ void __execute(HawkType* code,HawkType* m_memory){
         printf("Error: else without a previous if op\n");
         exit(1);
     }
-    _OP_EXIT:{
-        advance();
-        exit(m_memory[(long)code->number].number);  
-    }
     
     _OP_LOAD:{
         //LOAD <data> <address>
@@ -347,7 +339,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         HawkType address=(*code);
         advance();
-        m_memory[(long long)address.number]=m_memory[(long long)code->number];
+        m_memory[(long long)code->number]=m_memory[(long long)address.number];
         DISPATCH();
     }    
     

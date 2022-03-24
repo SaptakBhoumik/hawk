@@ -6,10 +6,10 @@ extern "C" {
 typedef double num;
 #define MAX_LIMIT 65535
 enum curr_type{
-    TYPE_NONE,
     TYPE_NUM,
     TYPE_LABEL,
     TYPE_ARRAY,
+    TYPE_STR,
     TYPE_PTR,
     TYPE_OP
 };
@@ -52,7 +52,6 @@ typedef enum {
     OP_SHR,
     OP_JMP,
     OP_RET,
-    OP_EXIT,
     OP_IF,
     OP_ELSE,
     OP_IF_NEQ,
