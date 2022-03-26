@@ -15,7 +15,7 @@ enum curr_type{
 };
 
 struct HawkType{
-    enum curr_type type;
+    char type;
     union{
         num number;
         void *so;
@@ -67,17 +67,16 @@ typedef enum {
     OP_APPEND,
     OP_MALLOC,
     OP_FREE,
-    OP_REALOC,
+    OP_REALLOC,
     OP_LEN,
     OP_GETPTR,
     OP_LDPTR_VAL,
     OP_ASPTR_VAL,
     OP_AT,
-    OP_CMALLOC,
-    OP_CREALOC,
     OP_DL_OPEN,
     OP_DL_CLOSE,
     OP_DL_CALL,
+    OP_POP,
 }opcode;
 #if defined(__cplusplus)
 };

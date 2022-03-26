@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include <cstdint>
+#include <bits/stdc++.h>
+//TODO: endianness
 namespace HAWK_VM{
 HAWK_FILE::HAWK_FILE(HawkType* code ,size_t size,std::string filename){
     m_filename=filename;
@@ -19,15 +21,24 @@ HawkType* HAWK_FILE::read(){
 }
 void HAWK_FILE::write(HawkType* code,size_t size,std::string filename){
     m_output_file=std::ofstream(filename, std::ios::binary);
+    if(!m_output_file){
+        std::cout<<"Error opening file: "<<filename<<"\n";
+        exit(1);
+    }
     m_output_file.write(reinterpret_cast<char*>(&size), sizeof(size));
     write(code,size);
     m_output_file.close();
 }
 void HAWK_FILE::write(HawkType* code,size_t size){
+    // std::reverse_copy(code,code+size,m_output_file);
     for(size_t i=0;i<size;i++){
         m_output_file.write(reinterpret_cast<char*>(&code[i].type), sizeof(code[i].type));
-        if(code[i].type==TYPE_NUM||code[i].type==TYPE_OP){
+        if(code[i].type==TYPE_NUM){
             m_output_file.write(reinterpret_cast<char*>(&code[i].number), sizeof(code[i].number));
+        }
+        else if(code[i].type==TYPE_OP){
+            char op= (char)code[i].number;
+            m_output_file.write(reinterpret_cast<char*>(&op), sizeof(op));
         }
         else if(code[i].type==TYPE_ARRAY||code[i].type==TYPE_STR||code[i].type==TYPE_LABEL){
             m_output_file.write(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));
@@ -37,6 +48,10 @@ void HAWK_FILE::write(HawkType* code,size_t size){
 }
 HawkType* HAWK_FILE::read(std::string filename){ 
     m_read_file=std::ifstream(filename, std::ios::binary);
+    if(!m_read_file){
+        std::cout<<"Error opening file: "<<filename<<"\n";
+        exit(1);
+    }
     m_read_file.read(reinterpret_cast<char*>(&m_size), sizeof(m_size));
     m_code=NULL;
     m_code=(HawkType*)malloc(m_size*sizeof(HawkType));
@@ -47,8 +62,13 @@ HawkType* HAWK_FILE::read(std::string filename){
 void HAWK_FILE::read(HawkType* code,size_t size){
     for(size_t i=0;i<size;i++){
         m_read_file.read(reinterpret_cast<char*>(&code[i].type), sizeof(code[i].type));
-        if(code[i].type==TYPE_NUM||code[i].type==TYPE_OP){
+        if(code[i].type==TYPE_NUM){
             m_read_file.read(reinterpret_cast<char*>(&code[i].number), sizeof(code[i].number));
+        }
+        else if(code[i].type==TYPE_OP){
+            char op=0;
+            m_read_file.read(reinterpret_cast<char*>(&op), sizeof(op));
+            code[i].number=op;
         }
         else if(code[i].type==TYPE_ARRAY||code[i].type==TYPE_STR||code[i].type==TYPE_LABEL){
             m_read_file.read(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));

@@ -144,17 +144,16 @@ void __execute(HawkType* code,HawkType* m_memory){
         insert(APPEND),
         insert(MALLOC),
         insert(FREE),
-        insert(REALOC),
+        insert(REALLOC),
         insert(LEN),
         insert(GETPTR),
         insert(LDPTR_VAL),
         insert(ASPTR_VAL),
         insert(AT),
-        insert(CMALLOC),
-        insert(CREALOC),
         insert(DL_OPEN),
         insert(DL_CLOSE),
         insert(DL_CALL),
+        insert(POP),
     };
     goto *dispatch[(opcode)code->number];
     
@@ -164,7 +163,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         HawkType r2=m_memory[(long long)code->number];
         advance();
-        m_memory[(long long)code->number]=r1.array[(long long)r2.number];
+        m_memory[(long long)code->number]=r2.array[(long long)r1.number];
         DISPATCH();
     }
     _OP_ASPTR_VAL:{
@@ -209,27 +208,14 @@ void __execute(HawkType* code,HawkType* m_memory){
         m_memory[(long long)code->number].array=malloc(size);
         DISPATCH();
     }
-    _OP_REALOC:{
+    _OP_REALLOC:{
         advance();
         num size=m_memory[(long long)code->number].number;
         advance();
         m_memory[(long long)code->number].array=realloc(m_memory[(long long)code->number].array,size);
         DISPATCH();
     }
-    _OP_CMALLOC:{
-        advance();
-        num size=code->number;
-        advance();
-        m_memory[(long long)code->number].array=malloc(size);
-        DISPATCH();
-    }
-    _OP_CREALOC:{
-        advance();
-        num size=code->number;
-        advance();
-        m_memory[(long long)code->number].array=realloc(m_memory[(long long)code->number].array,size);
-        DISPATCH();
-    }
+       
     _OP_INSERT:{
         advance();
         HawkType r1=m_memory[(long long)code->number];
@@ -246,6 +232,11 @@ void __execute(HawkType* code,HawkType* m_memory){
         HawkType* arr=&m_memory[(long long)code->number];
         arr->array[(long long)arr->size]=r1;
         arr->size++;
+        DISPATCH();
+    }
+    _OP_POP:{
+        advance();
+        m_memory[(long long)code->number].size--;
         DISPATCH();
     }
     _OP_EQ_ARRAY:{
