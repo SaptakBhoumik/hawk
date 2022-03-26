@@ -21,7 +21,7 @@
         HawkType r2=m_memory[(long long)code->number];\
         code++;\
         if((int)(r1.number curr_operator r2.number)){\
-            __execute(m_memory[(long long)code->number].array,m_memory);\
+            __execute(m_memory[(long long)code->number].ptr,m_memory);\
             if((opcode)(*(code+1)).number==OP_ELSE){\
                 code++;\
                 code++;\
@@ -31,7 +31,7 @@
             if((opcode)(*(code+1)).number==OP_ELSE){\
                 code++;\
                 code++;\
-                __execute(m_memory[(long long)code->number].array,m_memory);\
+                __execute(m_memory[(long long)code->number].ptr,m_memory);\
             }\
         }
 
@@ -68,14 +68,14 @@ int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
     int res=0;
     for(long long i=0;i<size1;i++){
         if(array2[i].type==TYPE_ARRAY||array2[i].type==TYPE_STR){
-           res=equality_array(array1[i].array,array1[i].size,array2[i].array,array2[i].size);
+           res=equality_array(array1[i].ptr,array1[i].size,array2[i].ptr,array2[i].size);
            if(!res){
                 res = 0;
                 break;
            } 
         }
         else if(array2[i].type==TYPE_PTR){
-            if(array1[i].PTR!=array2[i].PTR){
+            if(array1[i].ptr!=array2[i].ptr){
                 res=0;
                 break;
             }
@@ -96,8 +96,8 @@ int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
 inline char* to_str(HawkType item){
     char* res=malloc(sizeof(char)*(item.size+1));
     for(long long i=0;i<item.size;i++){
-        if(item.array[i].type!=TYPE_NUM){break;}
-        res[i]=item.array[i].number;
+        if(item.ptr[i].type!=TYPE_NUM){break;}
+        res[i]=item.ptr[i].number;
     }
     res[(long long)item.size]='\0';
     return res;
@@ -163,19 +163,19 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         HawkType r2=m_memory[(long long)code->number];
         advance();
-        m_memory[(long long)code->number]=r2.array[(long long)r1.number];
+        m_memory[(long long)code->number]=r2.ptr[(long long)r1.number];
         DISPATCH();
     }
     _OP_ASPTR_VAL:{
         advance();
-        HawkType* ptr=m_memory[(long long)code->number].PTR;
+        HawkType* ptr=m_memory[(long long)code->number].ptr;
         advance();
         *ptr=m_memory[(long long)code->number];
         DISPATCH();
     }
     _OP_LDPTR_VAL:{
         advance();
-        HawkType* ptr=m_memory[(long long)code->number].PTR;
+        HawkType* ptr=m_memory[(long long)code->number].ptr;
         advance();
         m_memory[(long long)code->number]=*ptr;
         DISPATCH();
@@ -184,7 +184,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         num index=m_memory[(long long)code->number].number;
         advance();
-        m_memory[(long long)code->number].PTR=&m_memory[(long long)index];
+        m_memory[(long long)code->number].ptr=&m_memory[(long long)index];
         DISPATCH();
     }
     _OP_LEN:{
@@ -196,8 +196,8 @@ void __execute(HawkType* code,HawkType* m_memory){
     }
     _OP_FREE:{
         advance();
-        free(m_memory[(long long)code->number].array);
-        m_memory[(long long)code->number].array=NULL;
+        free(m_memory[(long long)code->number].ptr);
+        m_memory[(long long)code->number].ptr=NULL;
         m_memory[(long long)code->number].size=0;
         DISPATCH();        
     }
@@ -205,14 +205,14 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         num size=m_memory[(long long)code->number].number;
         advance();
-        m_memory[(long long)code->number].array=malloc(size);
+        m_memory[(long long)code->number].ptr=malloc(size);
         DISPATCH();
     }
     _OP_REALLOC:{
         advance();
         num size=m_memory[(long long)code->number].number;
         advance();
-        m_memory[(long long)code->number].array=realloc(m_memory[(long long)code->number].array,size);
+        m_memory[(long long)code->number].ptr=realloc(m_memory[(long long)code->number].ptr,size);
         DISPATCH();
     }
        
@@ -222,7 +222,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         HawkType r2=m_memory[(long long)code->number];
         advance();
-        m_memory[(long long)code->number].array[(long long)r2.number]=r1;
+        m_memory[(long long)code->number].ptr[(long long)r2.number]=r1;
         DISPATCH();
     }
     _OP_APPEND:{
@@ -230,7 +230,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         HawkType r1=m_memory[(long long)code->number];
         advance();
         HawkType* arr=&m_memory[(long long)code->number];
-        arr->array[(long long)arr->size]=r1;
+        arr->ptr[(long long)arr->size]=r1;
         arr->size++;
         DISPATCH();
     }
@@ -241,10 +241,10 @@ void __execute(HawkType* code,HawkType* m_memory){
     }
     _OP_EQ_ARRAY:{
         advance();
-        HawkType* array1=m_memory[(long long)code->number].array;
+        HawkType* array1=m_memory[(long long)code->number].ptr;
         num size1=m_memory[(long long)code->number].size;
         advance();
-        HawkType* array2=m_memory[(long long)code->number].array;
+        HawkType* array2=m_memory[(long long)code->number].ptr;
         num size2=m_memory[(long long)code->number].size;
         advance();
         int res=0;
@@ -293,7 +293,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         advance();
         if((int)m_memory[(long long)code->number].number){
             advance();
-            __execute(m_memory[(long long)code->number].array,m_memory);
+            __execute(m_memory[(long long)code->number].ptr,m_memory);
             if((opcode)(*(code+1)).number==OP_ELSE){
                 advance();
                 advance();
@@ -304,7 +304,7 @@ void __execute(HawkType* code,HawkType* m_memory){
             if((opcode)(*(code+1)).number==OP_ELSE){
                 advance();
                 advance();
-                __execute(m_memory[(long long)code->number].array,m_memory);
+                __execute(m_memory[(long long)code->number].ptr,m_memory);
             }
         }
         DISPATCH();
@@ -466,7 +466,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         //JMP <address>
         //Jump to <address>
         advance();
-        __execute(m_memory[(long long)code->number].array,m_memory);
+        __execute(m_memory[(long long)code->number].ptr,m_memory);
         DISPATCH();
     }
 
@@ -478,7 +478,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         #if defined _WIN32 || defined __CYGWIN__
         m_memory[(long long)code->number].so = LoadLibrary(r1_str);   
         #else
-        m_memory[(long long)code->number].so = dlopen(r1_str, RTLD_NOW);   
+        m_memory[(long long)code->number].ptr = dlopen(r1_str, RTLD_NOW);   
         #endif  
         free(r1_str);
         r1_str=NULL;
@@ -489,7 +489,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         #if defined _WIN32 || defined __CYGWIN__
         FreeLibrary(m_memory[(long long)code->number].so);   
         #else
-        dlclose(m_memory[(long long)code->number].so); 
+        dlclose(m_memory[(long long)code->number].ptr); 
         #endif    
         DISPATCH();
     }
@@ -500,7 +500,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         #if defined _WIN32 || defined __CYGWIN__
         ext_func func = GetProcAddress(m_memory[(long long)code->number].so, r1);
         #else
-        ext_func func = dlsym(m_memory[(long long)code->number].so, r1);
+        ext_func func = dlsym(m_memory[(long long)code->number].ptr, r1);
         #endif
         free(r1);
         r1=NULL;

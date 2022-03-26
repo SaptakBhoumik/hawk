@@ -32,7 +32,8 @@ void HAWK_FILE::write(HawkType* code,size_t size,std::string filename){
 void HAWK_FILE::write(HawkType* code,size_t size){
     // std::reverse_copy(code,code+size,m_output_file);
     for(size_t i=0;i<size;i++){
-        m_output_file.write(reinterpret_cast<char*>(&code[i].type), sizeof(code[i].type));
+        char type=code[i].type;
+        m_output_file.write(reinterpret_cast<char*>(&type), sizeof(type));
         if(code[i].type==TYPE_NUM){
             m_output_file.write(reinterpret_cast<char*>(&code[i].number), sizeof(code[i].number));
         }
@@ -42,7 +43,7 @@ void HAWK_FILE::write(HawkType* code,size_t size){
         }
         else if(code[i].type==TYPE_ARRAY||code[i].type==TYPE_STR||code[i].type==TYPE_LABEL){
             m_output_file.write(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));
-            write(code[i].array,code[i].size);
+            write(code[i].ptr,code[i].size);
         }
     }
 }
@@ -61,7 +62,9 @@ HawkType* HAWK_FILE::read(std::string filename){
 }
 void HAWK_FILE::read(HawkType* code,size_t size){
     for(size_t i=0;i<size;i++){
-        m_read_file.read(reinterpret_cast<char*>(&code[i].type), sizeof(code[i].type));
+        char type=0;
+        m_read_file.read(reinterpret_cast<char*>(&type), sizeof(type));
+        code[i].type=(curr_type)type;
         if(code[i].type==TYPE_NUM){
             m_read_file.read(reinterpret_cast<char*>(&code[i].number), sizeof(code[i].number));
         }
@@ -72,9 +75,9 @@ void HAWK_FILE::read(HawkType* code,size_t size){
         }
         else if(code[i].type==TYPE_ARRAY||code[i].type==TYPE_STR||code[i].type==TYPE_LABEL){
             m_read_file.read(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));
-            code[i].array=(HawkType*)malloc(code[i].size*sizeof(HawkType));
-            read(code[i].array,code[i].size);
-            to_clear.push_back(&code[i].array);
+            code[i].ptr=(HawkType*)malloc(code[i].size*sizeof(HawkType));
+            read(code[i].ptr,code[i].size);
+            to_clear.push_back(&code[i].ptr);
         }
     }
 }

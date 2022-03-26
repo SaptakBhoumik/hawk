@@ -104,7 +104,7 @@ void print_array(HawkType* arr,size_t size,bool is_comment=false){
             }
         }
         else if(arr[i].type==TYPE_ARRAY){
-            print_array(arr[i].array,arr[i].size,is_comment);
+            print_array(arr[i].ptr,arr[i].size,is_comment);
         }
         else if(arr[i].type==TYPE_STR){
             if (!is_comment) {
@@ -113,10 +113,10 @@ void print_array(HawkType* arr,size_t size,bool is_comment=false){
             std::cout<<"\'";
             for(size_t j=0;j<arr[i].size;++j){
                 if(is_comment){
-                    comment_print(arr[i].array[j].number);
+                    comment_print(arr[i].ptr[j].number);
                 }
                 else{
-                    printf("%c",(char)arr[i].array[j].number);
+                    printf("%c",(char)arr[i].ptr[j].number);
                 }
             }
             std::cout<<"\'";
@@ -126,10 +126,10 @@ void print_array(HawkType* arr,size_t size,bool is_comment=false){
         }
         else if(arr[i].type==TYPE_PTR){
             if(is_comment){
-                comment_print(arr[i].PTR);
+                comment_print(arr[i].ptr);
             }
             else{
-                num_print(arr[i].PTR);
+                num_print(arr[i].ptr);
             }
         }
         if(i<size-1){
@@ -166,21 +166,21 @@ void HAWK_DIS::disassemble(HawkType* code,std::string spacing){
                     num_print(code->number);
                 }
                 else if(code->type==TYPE_ARRAY){
-                    print_array(code->array,code->size);
+                    print_array(code->ptr,code->size);
                 }
                 else if(code->type==TYPE_STR){
                     std::cout<<"\e[33m\'";
                     for(size_t i=0;i<code->size;++i){
-                        printf("%c",(char)code->array[i].number);
+                        printf("%c",(char)code->ptr[i].number);
                     }
                     std::cout<<"\'\e[0m";
                 }
                 else if(code->type==TYPE_PTR){
-                    num_print(code->PTR);
+                    num_print(code->ptr);
                 }
                 else if(code->type==TYPE_LABEL){
                     std::cout<<":\n";
-                    disassemble(code->array,spacing+"\t");
+                    disassemble(code->ptr,spacing+"\t");
                 }
                 advance();
                 if(val.type!=TYPE_LABEL){
@@ -193,17 +193,17 @@ void HAWK_DIS::disassemble(HawkType* code,std::string spacing){
                         comment_print(val.number);
                     }
                     else if(val.type==TYPE_ARRAY){
-                        print_array(val.array,val.size,true);
+                        print_array(val.ptr,val.size,true);
                     }
                     else if(val.type==TYPE_STR){
                         comment_print("\'");
                         for(size_t i=0;i<val.size;++i){
-                            comment_print((char)val.array[i].number);
+                            comment_print((char)val.ptr[i].number);
                         }
                         comment_print("\'");
                     }
                     else if(val.type==TYPE_PTR){
-                        comment_print(val.PTR);
+                        comment_print(val.ptr);
                     }
                 }
                 std::cout<<"\n";

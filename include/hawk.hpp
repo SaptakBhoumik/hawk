@@ -1,5 +1,6 @@
 #ifndef MAIN__HAWK__H
 #define MAIN__HAWK__H
+#include <stdint.h>
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -15,13 +16,11 @@ enum curr_type{
 };
 
 struct HawkType{
-    char type;
+    enum curr_type type;
     union{
         num number;
-        void *so;
-        struct HawkType* PTR;
         struct{ 
-            struct HawkType* array;
+            struct HawkType* ptr;
             num size;
         };
     };
