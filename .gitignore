@@ -6,4 +6,15 @@
 test.*
 test
 test*.*
-./builddir
+.vscode
+.idea
+**.out
+**.exe
+*.so
+*.o
+temp
+/builddir
+*.elf
+doctest.h
+*.html
+can_comp

@@ -41,7 +41,14 @@ void HAWK_FILE::write(HawkType* code,size_t size){
             char op= (char)code[i].number;
             m_output_file.write(reinterpret_cast<char*>(&op), sizeof(op));
         }
-        else if(code[i].type==TYPE_ARRAY||code[i].type==TYPE_STR||code[i].type==TYPE_LABEL){
+        else if(code[i].type==TYPE_STR){
+            m_output_file.write(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));
+            for(size_t j=0;j<code[i].size;++j){
+                char res=code[i].ptr[j].number;
+                m_output_file.write(reinterpret_cast<char*>(&res), sizeof(res));
+            }
+        }
+        else if(code[i].type==TYPE_ARRAY||code[i].type==TYPE_LABEL){
             m_output_file.write(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));
             write(code[i].ptr,code[i].size);
         }
@@ -73,7 +80,16 @@ void HAWK_FILE::read(HawkType* code,size_t size){
             m_read_file.read(reinterpret_cast<char*>(&op), sizeof(op));
             code[i].number=op;
         }
-        else if(code[i].type==TYPE_ARRAY||code[i].type==TYPE_STR||code[i].type==TYPE_LABEL){
+        else if(code[i].type==TYPE_STR){
+            m_read_file.read(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));
+            code[i].ptr=(HawkType*)malloc(code[i].size*sizeof(HawkType));
+            for(size_t j=0;j<code[i].size;++j){
+                char res=0;
+                m_read_file.read(reinterpret_cast<char*>(&res), sizeof(res));
+                code[i].ptr[j]=(HawkType){.type=TYPE_NUM ,.number=(num)res};
+            }
+        }
+        else if(code[i].type==TYPE_ARRAY||code[i].type==TYPE_LABEL){
             m_read_file.read(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));
             code[i].ptr=(HawkType*)malloc(code[i].size*sizeof(HawkType));
             read(code[i].ptr,code[i].size);
