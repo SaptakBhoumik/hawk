@@ -460,6 +460,21 @@ void HAWK_DIS::disassemble(HawkType* code,std::string spacing){
                 std::cout<<"\n";
                 break;
             }
+            case OP_BACK:{
+                op_print("back");
+                std::cout<<" ";
+                advance();
+                auto r1=*code;
+                reg_print(code->number);
+                std::cout<<" ";
+                advance();
+                auto r2=*code;
+                reg_print(code->number);
+                std::cout<<"\t";
+                comment_print(";$"<<r2.number<<"=$"<<r1.number<<".back()");
+                std::cout<<"\n";
+                break;
+            }
             case OP_DL_CALL:{
                 op_print("dl_call");
                 std::cout<<" ";

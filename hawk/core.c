@@ -64,7 +64,7 @@
 
 typedef struct HawkType HawkType;
 typedef void (*ext_func)(HawkType ,HawkType*);
-int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
+static inline int equality_array(HawkType* array1,num size1,HawkType* array2,num size){
     int res=0;
     for(long long i=0;i<size1;i++){
         if(array2[i].type==TYPE_ARRAY||array2[i].type==TYPE_STR){
@@ -154,9 +154,17 @@ void __execute(HawkType* code,HawkType* m_memory){
         insert(DL_CLOSE),
         insert(DL_CALL),
         insert(POP),
+        insert(BACK),
     };
     goto *dispatch[(opcode)code->number];
-    
+    _OP_BACK:{
+        advance();
+        HawkType r1=m_memory[(long long)code->number];
+        advance();
+        m_memory[(long long)code->number]=r1.ptr[(long long)r1.size-1];
+        DISPATCH();
+    }
+
     _OP_AT:{
         advance();
         HawkType r1=m_memory[(long long)code->number];

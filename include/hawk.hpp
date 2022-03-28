@@ -50,7 +50,7 @@ typedef enum {
     OP_SHL,
     OP_SHR,
     OP_JMP,
-    OP_RET,
+    OP_RET,//
     OP_IF,
     OP_ELSE,
     OP_IF_NEQ,
@@ -76,6 +76,7 @@ typedef enum {
     OP_DL_CLOSE,
     OP_DL_CALL,
     OP_POP,
+    OP_BACK,
 }opcode;
 #if defined(__cplusplus)
 };
