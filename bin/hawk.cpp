@@ -20,7 +20,7 @@ int main(int argc,char* argv[]){
     auto s2=std::string(argv[2]);
     HAWK_FILE f2(s2);
     auto codes=f2.read();
-    HawkType m_memory[MAX_LIMIT];
+    HawkType* m_memory=(HawkType*)malloc(MAX_LIMIT*sizeof(HawkType));
     auto x= HAWK(codes,m_memory);
     auto y=HAWK_DIS(codes);
     if(s1=="-dis"){
@@ -36,5 +36,7 @@ int main(int argc,char* argv[]){
         return 1;
     }
     f2.clean_up();
+    free(m_memory);
+    m_memory=NULL;
     return 0;
 }

@@ -38,6 +38,11 @@ HawkOperation operator <<(HawkType, HawkType);//OP_SHL
 HawkOperation operator >>(HawkType, HawkType);//OP_SHR
 HawkOperation jmp(HawkType);//OP_JMP
 HawkOperation ret();//OP_RET
+HawkOperation op_if(HawkType,HawkType);
+HawkOperation op_if(HawkOperation,HawkType);
+HawkOperation op_else(HawkType);
+HawkOperation compare_array(HawkType,HawkType);
+HawkOperation destroy(HawkType);
 
 }
 #endif

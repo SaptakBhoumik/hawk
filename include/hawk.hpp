@@ -1,6 +1,7 @@
 #ifndef MAIN__HAWK__H
 #define MAIN__HAWK__H
 #include <stdint.h>
+#include <stddef.h>
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -21,13 +22,13 @@ struct HawkType{
         num number;
         struct{ 
             struct HawkType* ptr;
-            num size;
+            size_t size;
         };
     };
 };
 typedef enum {
-    OP_LOAD,
-    OP_MOV,
+    OP_LOAD,//
+    OP_MOV,//
     OP_ADD,
     OP_SUB,
     OP_NEG,
@@ -50,7 +51,7 @@ typedef enum {
     OP_SHL,
     OP_SHR,
     OP_JMP,
-    OP_RET,//
+    OP_RET,
     OP_IF,
     OP_ELSE,
     OP_IF_NEQ,
@@ -62,8 +63,8 @@ typedef enum {
     OP_IF_AND,
     OP_IF_OR,
     OP_EQ_ARRAY,
-    OP_INSERT,
-    OP_APPEND,
+    OP_INSERT,//
+    OP_APPEND,//
     OP_MALLOC,
     OP_FREE,
     OP_REALLOC,
