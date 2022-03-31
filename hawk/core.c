@@ -176,9 +176,9 @@ void __execute(HawkType* code,HawkType* m_memory){
     }
     _OP_ASPTR_VAL:{
         advance();
-        HawkType* ptr=m_memory[(long long)code->number].ptr;
+        HawkType val=m_memory[(long long)code->number];
         advance();
-        *ptr=m_memory[(long long)code->number];
+        *m_memory[(long long)code->number].ptr=val;
         DISPATCH();
     }
     _OP_LDPTR_VAL:{

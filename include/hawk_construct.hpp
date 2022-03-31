@@ -1,20 +1,20 @@
 #ifndef CONSTRUCT__HAWK__H
 #define CONSTRUCT__HAWK__H
 #include "hawk.hpp"
+#include <dlfcn.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
-#define $ _hawktype_init
+#define $ _reg
 namespace HAWK_VM{  
 struct HawkOperation;
-HawkType $();
-HawkType $(num);
+HawkType $(uint16_t);
 HawkType str(std::string);
 HawkType number(num);
-HawkType array(HawkType, num);
 HawkType array(std::vector<HawkType>);
-HawkType func(HawkType, num);
-HawkType func(std::vector<HawkType>);
+HawkType array(std::vector<std::string>);
+HawkType array(std::vector<num>);
+HawkType label(std::vector<HawkType>);
 HawkOperation operator +(HawkType, HawkType);//OP_ADD
 HawkOperation operator -(HawkType);//OP_NEG
 HawkOperation operator -(HawkType, HawkType);//OP_SUB
@@ -36,13 +36,36 @@ HawkOperation operator |(HawkType, HawkType);//OP_BIT_OR
 HawkOperation operator ~(HawkType);//OP_BIT_NOT
 HawkOperation operator <<(HawkType, HawkType);//OP_SHL
 HawkOperation operator >>(HawkType, HawkType);//OP_SHR
-HawkOperation jmp(HawkType);//OP_JMP
-HawkOperation ret();//OP_RET
-HawkOperation op_if(HawkType,HawkType);
-HawkOperation op_if(HawkOperation,HawkType);
-HawkOperation op_else(HawkType);
-HawkOperation compare_array(HawkType,HawkType);
-HawkOperation destroy(HawkType);
-
+HawkOperation operator &(HawkType);//TODO:
+HawkOperation operator *(HawkType);//TODO:
+HawkOperation array_eq(HawkType);
+HawkOperation append(HawkType);
+HawkOperation insert(HawkType,HawkType);
+HawkOperation at(HawkType,HawkType);
+HawkOperation allocate(HawkType);
+HawkOperation reallocate(HawkType);
+HawkOperation len(HawkType);
+HawkOperation dlopen(HawkType);
+HawkOperation back(HawkType);
+class HAWK_CONSTRUCT{
+    HawkType* code=nullptr;
+    public:
+    HAWK_CONSTRUCT();
+    void clean_up();
+    void operation(HawkType,HawkOperation);
+    void operation(HawkOperation,HawkType);
+    void load(HawkType,HawkType);
+    void mov(HawkType,HawkType);
+    void jmp(HawkType);
+    void ret();
+    void if_branch(HawkType,HawkType);
+    void if_branch(HawkOperation,HawkType);
+    void else_branch(HawkType);
+    void free(HawkType);
+    void dlclose(HawkType);
+    void pop(HawkType);
+    void clear_up();
+    void dlcall(HawkType,HawkType,HawkType);
+};
 }
 #endif

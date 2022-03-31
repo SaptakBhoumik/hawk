@@ -13,7 +13,8 @@ enum curr_type{
     TYPE_ARRAY,
     TYPE_STR,
     TYPE_PTR,
-    TYPE_OP
+    TYPE_OP,
+    TYPE_REGISTER
 };
 
 struct HawkType{
@@ -27,8 +28,8 @@ struct HawkType{
     };
 };
 typedef enum {
-    OP_LOAD,//
-    OP_MOV,//
+    OP_LOAD,
+    OP_MOV,
     OP_ADD,
     OP_SUB,
     OP_NEG,
@@ -63,8 +64,8 @@ typedef enum {
     OP_IF_AND,
     OP_IF_OR,
     OP_EQ_ARRAY,
-    OP_INSERT,//
-    OP_APPEND,//
+    OP_INSERT,
+    OP_APPEND,
     OP_MALLOC,
     OP_FREE,
     OP_REALLOC,

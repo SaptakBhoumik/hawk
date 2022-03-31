@@ -41,6 +41,10 @@ void HAWK_FILE::write(HawkType* code,size_t size){
             char op= (char)code[i].number;
             m_output_file.write(reinterpret_cast<char*>(&op), sizeof(op));
         }
+        else if(code[i].type==TYPE_REGISTER){
+            uint16_t op= (uint16_t)code[i].number;
+            m_output_file.write(reinterpret_cast<char*>(&op), sizeof(op));
+        }
         else if(code[i].type==TYPE_STR){
             m_output_file.write(reinterpret_cast<char*>(&code[i].size), sizeof(code[i].size));
             for(size_t j=0;j<code[i].size;++j){
@@ -77,6 +81,11 @@ void HAWK_FILE::read(HawkType* code,size_t size){
         }
         else if(code[i].type==TYPE_OP){
             char op=0;
+            m_read_file.read(reinterpret_cast<char*>(&op), sizeof(op));
+            code[i].number=op;
+        }
+        else if(code[i].type==TYPE_REGISTER){
+            uint16_t op=0;
             m_read_file.read(reinterpret_cast<char*>(&op), sizeof(op));
             code[i].number=op;
         }
