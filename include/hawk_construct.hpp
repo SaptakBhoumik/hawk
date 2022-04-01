@@ -1,7 +1,6 @@
 #ifndef CONSTRUCT__HAWK__H
 #define CONSTRUCT__HAWK__H
 #include "hawk.hpp"
-#include <dlfcn.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -62,7 +61,7 @@ class HAWK_CONSTRUCT{
     void jmp(HawkType);
     void ret();
     void jmp_if(HawkType,HawkType);
-    void jmp_if(HawkOperation,HawkType);//TODO:
+    void jmp_if(HawkOperation,HawkType);
     void jmp_else(HawkType);
     void destroy(HawkType);
     void dlclose(HawkType);

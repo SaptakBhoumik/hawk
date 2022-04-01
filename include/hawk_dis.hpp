@@ -1,7 +1,6 @@
 #ifndef HAWK__DIS__H
 #define HAWK__DIS__H
 #include "hawk.hpp"
-#include <fstream>
 #include <string>
 #include <vector>
 namespace HAWK_VM{
