@@ -36,8 +36,8 @@ HawkOperation operator |(HawkType, HawkType);//OP_BIT_OR
 HawkOperation operator ~(HawkType);//OP_BIT_NOT
 HawkOperation operator <<(HawkType, HawkType);//OP_SHL
 HawkOperation operator >>(HawkType, HawkType);//OP_SHR
-HawkOperation operator &(HawkType);//TODO:
-HawkOperation operator *(HawkType);//TODO:
+HawkOperation operator &(HawkType);
+HawkOperation operator *(HawkType);
 HawkOperation array_eq(HawkType);
 HawkOperation append(HawkType);
 HawkOperation insert(HawkType,HawkType);
@@ -49,22 +49,24 @@ HawkOperation dlopen(HawkType);
 HawkOperation back(HawkType);
 class HAWK_CONSTRUCT{
     HawkType* code=nullptr;
+    std::vector<HawkType> m_code;
     public:
-    HAWK_CONSTRUCT();
+    HAWK_CONSTRUCT()=default;
+    HawkType* get_code();
+    size_t get_code_size();
     void clean_up();
     void operation(HawkType,HawkOperation);
-    void operation(HawkOperation,HawkType);
+    void load_ptr_val(HawkType,HawkType);
     void load(HawkType,HawkType);
     void mov(HawkType,HawkType);
     void jmp(HawkType);
     void ret();
-    void if_branch(HawkType,HawkType);
-    void if_branch(HawkOperation,HawkType);
-    void else_branch(HawkType);
-    void free(HawkType);
+    void jmp_if(HawkType,HawkType);
+    void jmp_if(HawkOperation,HawkType);//TODO:
+    void jmp_else(HawkType);
+    void destroy(HawkType);
     void dlclose(HawkType);
     void pop(HawkType);
-    void clear_up();
     void dlcall(HawkType,HawkType,HawkType);
 };
 }

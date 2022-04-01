@@ -20,6 +20,12 @@ HawkType number(num number){
     reg.number=number;
     return reg;
 }
+HawkType get_op(opcode op){
+    HawkType reg;
+    reg.type=TYPE_OP;
+    reg.number=op;
+    return reg;
+}
 HawkType str(std::string string){
     HawkType reg;
     reg.type=TYPE_STR;
@@ -222,6 +228,20 @@ HawkOperation operator ~(HawkType left){
     op.is_uni=true;
     return op;
 }
+HawkOperation operator &(HawkType left){
+    HawkOperation op;
+    op.left=left;
+    op.op=OP_GETPTR;
+    op.is_uni=true;
+    return op;
+}
+HawkOperation operator *(HawkType left){
+    HawkOperation op;
+    op.left=left;
+    op.op=OP_LDPTR_VAL;
+    op.is_uni=true;
+    return op;
+}
 HawkOperation array_eq(HawkType left,HawkType right){
     HawkOperation op;
     op.left=left;
@@ -242,5 +262,169 @@ HawkOperation insert(HawkType left,HawkType right){
     op.right=right;
     op.op=OP_INSERT;
     return op;
+}
+HawkOperation at(HawkType left,HawkType right){
+    HawkOperation op;
+    op.left=left;
+    op.right=right;
+    op.op=OP_AT;
+    return op;
+}
+HawkOperation allocate(HawkType left){
+    HawkOperation op;
+    op.left=left;
+    op.is_uni=true;
+    op.op=OP_MALLOC;
+    return op;
+}
+HawkOperation reallocate(HawkType left){
+    HawkOperation op;
+    op.left=left;
+    op.is_uni=true;
+    op.op=OP_REALLOC;
+    return op;
+}
+HawkOperation len(HawkType left){
+    HawkOperation op;
+    op.left=left;
+    op.is_uni=true;
+    op.op=OP_LEN;
+    return op;
+}
+HawkOperation dlopen(HawkType left){
+    HawkOperation op;
+    op.left=left;
+    op.is_uni=true;
+    op.op=OP_DL_OPEN;
+    return op;
+}
+HawkOperation back(HawkType left){
+    HawkOperation op;
+    op.left=left;
+    op.is_uni=true;
+    op.op=OP_BACK;
+    return op;
+}
+HawkType* HAWK_CONSTRUCT::get_code(){
+    code=(HawkType*)malloc(sizeof(HawkType)*m_code.size());
+    for(int i=0;i<m_code.size();i++){
+        code[i]=m_code[i];
+    }
+    return code;
+}
+size_t HAWK_CONSTRUCT::get_code_size(){
+    return m_code.size();
+}
+void HAWK_CONSTRUCT::clean_up(){
+    m_code.clear();
+    if(code!=NULL){
+        for(auto&i:to_clean_up){
+            if((*i)!=NULL) {
+                free(*i);
+                *i=NULL;
+            }
+        }
+        free(code);
+        code=NULL;
+    }
+}
+void HAWK_CONSTRUCT::load_ptr_val(HawkType reg1,HawkType reg2){
+    m_code.push_back(get_op(OP_LDPTR_VAL));
+    m_code.push_back(reg1);
+    m_code.push_back(reg2);
+}
+void HAWK_CONSTRUCT::operation(HawkType reg,HawkOperation op){
+    m_code.push_back(get_op(op.op));
+    m_code.push_back(op.left);
+    if(op.is_uni!=true){
+        m_code.push_back(op.right);
+    }
+    m_code.push_back(reg);
+}
+void HAWK_CONSTRUCT::load(HawkType reg,HawkType value){
+    m_code.push_back(get_op(OP_LOAD));
+    m_code.push_back(value);
+    m_code.push_back(reg);
+}
+void HAWK_CONSTRUCT::mov(HawkType reg1,HawkType reg2){
+    m_code.push_back(get_op(OP_MOV));
+    m_code.push_back(reg1);
+    m_code.push_back(reg2);
+}
+void HAWK_CONSTRUCT::jmp(HawkType loc){
+    m_code.push_back(get_op(OP_JMP));
+    m_code.push_back(loc);
+}
+void HAWK_CONSTRUCT::ret(){
+    m_code.push_back(get_op(OP_RET));
+}
+void HAWK_CONSTRUCT::jmp_if(HawkType reg,HawkType loc){
+    m_code.push_back(get_op(OP_IF));
+    m_code.push_back(reg);
+    m_code.push_back(loc);
+}
+void HAWK_CONSTRUCT::jmp_else(HawkType loc){
+    m_code.push_back(get_op(OP_ELSE));
+    m_code.push_back(loc);
+}
+void HAWK_CONSTRUCT::destroy(HawkType loc){
+    m_code.push_back(get_op(OP_FREE));
+    m_code.push_back(loc);
+}
+void HAWK_CONSTRUCT::dlclose(HawkType reg){
+    m_code.push_back(get_op(OP_DL_CLOSE));
+    m_code.push_back(reg);
+}
+void HAWK_CONSTRUCT::pop(HawkType reg){
+    m_code.push_back(get_op(OP_POP));
+    m_code.push_back(reg);
+}
+void HAWK_CONSTRUCT::dlcall(HawkType r1,HawkType r2,HawkType r3){
+    m_code.push_back(get_op(OP_DL_CALL));
+    m_code.push_back(r1);
+    m_code.push_back(r2);
+    m_code.push_back(r3);
+}
+void HAWK_CONSTRUCT::jmp_if(HawkOperation op,HawkType reg){
+    switch (op.op){
+        case OP_NEQ:{
+            m_code.push_back(get_op(OP_IF_NEQ));
+            break;
+        }
+        case OP_EQ:{
+            m_code.push_back(get_op(OP_IF_EQ));
+            break;
+        }
+        case OP_LT:{
+            m_code.push_back(get_op(OP_IF_LT));
+            break;
+        }
+        case OP_GT:{
+            m_code.push_back(get_op(OP_IF_GT));
+            break;
+        }
+        case OP_LE:{
+            m_code.push_back(get_op(OP_IF_LE));
+            break;
+        }
+        case OP_GE:{
+            m_code.push_back(get_op(OP_IF_GE));
+            break;
+        }
+        case OP_AND:{
+            m_code.push_back(get_op(OP_IF_AND));
+            break;
+        }
+        case OP_OR:{
+            m_code.push_back(get_op(OP_IF_OR));
+            break;
+        }
+        default:{
+            std::cout << "Opcode " <<op.op << "cant be in a if branch"<< std::endl;
+        }
+    }
+    m_code.push_back(op.left);
+    m_code.push_back(op.right);
+    m_code.push_back(reg);
 }
 }
