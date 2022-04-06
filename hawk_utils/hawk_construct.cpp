@@ -2,12 +2,7 @@
 #include <iostream>
 namespace HAWK_VM{
 std::vector<HawkType**> to_clean_up;
-struct HawkOperation{
-    HawkType left;
-    HawkType right;
-    opcode op;
-    bool is_uni=false;
-};
+
 HawkType $(uint16_t number){
     HawkType reg;
     reg.type=TYPE_REGISTER;
@@ -124,7 +119,7 @@ HawkOperation operator ^(HawkType left,HawkType right){
     op.op=OP_BIT_XOR;
     return op;
 }
-HawkOperation operator &(HawkType left,HawkType right){
+HawkOperation ptr(HawkType left,HawkType right){
     HawkOperation op;
     op.left=left;
     op.right=right;

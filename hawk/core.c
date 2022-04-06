@@ -158,6 +158,7 @@ void __execute(HawkType* code,HawkType* m_memory){
     };
     goto *dispatch[(opcode)code->number];
     _OP_BACK:{
+        //back <register1> <register2> ;$register2 = $register1.back()
         advance();
         HawkType r1=m_memory[(long long)code->number];
         advance();
@@ -166,6 +167,7 @@ void __execute(HawkType* code,HawkType* m_memory){
     }
 
     _OP_AT:{
+        //at <register1> <register2> <destination>;$destination = $register2.at($register1)
         advance();
         HawkType r1=m_memory[(long long)code->number];
         advance();
@@ -175,6 +177,7 @@ void __execute(HawkType* code,HawkType* m_memory){
         DISPATCH();
     }
     _OP_ASPTR_VAL:{
+        //asptr_val <register1> <destination>;*$destination = $register1
         advance();
         HawkType val=m_memory[(long long)code->number];
         advance();

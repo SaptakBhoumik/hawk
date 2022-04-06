@@ -35,7 +35,7 @@ HawkOperation operator |(HawkType, HawkType);//OP_BIT_OR
 HawkOperation operator ~(HawkType);//OP_BIT_NOT
 HawkOperation operator <<(HawkType, HawkType);//OP_SHL
 HawkOperation operator >>(HawkType, HawkType);//OP_SHR
-HawkOperation operator &(HawkType);
+HawkOperation ptr(HawkType);
 HawkOperation operator *(HawkType);
 HawkOperation array_eq(HawkType);
 HawkOperation append(HawkType);
@@ -67,6 +67,12 @@ class HAWK_CONSTRUCT{
     void dlclose(HawkType);
     void pop(HawkType);
     void dlcall(HawkType,HawkType,HawkType);
+};
+struct HawkOperation{
+    HawkType left;
+    HawkType right;
+    opcode op;
+    bool is_uni=false;
 };
 }
 #endif
