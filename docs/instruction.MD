@@ -15,7 +15,8 @@ back <register1> <destination> ;$destination = $register1.back()
 Same as
 
 ```cpp
-destination = register1.back()//get the last element of the array```
+destination = register1.back()//get the last element of the array
+```
 
 
 #### AT
