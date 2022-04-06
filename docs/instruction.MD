@@ -253,3 +253,205 @@ Same as
 ```cpp
 destination = register1 - register2//subtract register2 from register1 and assign to destination
 ```
+
+#### MUL
+```assembly
+mul <register1> <register2> <destination>;$destination = $register1 * $register2
+```
+Same as
+```cpp
+destination = register1 * register2//multiply register1 and register2 and assign to destination
+```
+
+#### DIV
+```assembly
+div <register1> <register2> <destination>;$destination = $register1 / $register2
+```
+Same as
+```cpp
+destination = register1 / register2//divide register1 by register2 and assign to destination
+```
+
+#### MOD
+```assembly
+mod <register1> <register2> <destination>;$destination = $register1 % $register2
+```
+Same as
+```cpp
+destination = register1 % register2//modulo register1 by register2 and assign to destination
+```
+
+#### BIT_XOR
+```assembly
+bit_xor <register1> <register2> <destination>;$destination = $register1 ^ $register2
+```
+Same as
+```cpp
+destination = register1 ^ register2//bitwise xor register1 and register2 and assign to destination
+```
+
+#### EQ
+```assembly
+eq <register1> <register2> <destination>;$destination = $register1 == $register2
+```
+Same as
+```cpp
+destination = register1 == register2//check if register1 is equal to register2 and assign to destination
+```
+#### NEQ
+```assembly
+neq <register1> <register2> <destination>;$destination = $register1 != $register2
+```
+Same as
+```cpp
+destination = register1 != register2//check if register1 is not equal to register2 and assign to destination
+```
+#### GT
+```assembly
+gt <register1> <register2> <destination>;$destination = $register1 > $register2
+```
+Same as
+```cpp
+destination = register1 > register2//check if register1 is greater than register2 and assign to destination
+```
+#### LT
+```assembly
+lt <register1> <register2> <destination>;$destination = $register1 < $register2
+```
+Same as
+```cpp
+destination = register1 < register2//check if register1 is less than register2 and assign to destination
+```
+#### GE
+```assembly
+ge <register1> <register2> <destination>;$destination = $register1 >= $register2
+```
+Same as
+```cpp
+destination = register1 >= register2//check if register1 is greater than or equal to register2 and assign to destination
+```
+#### LE
+```assembly
+le <register1> <register2> <destination>;$destination = $register1 <= $register2
+```
+Same as
+```cpp
+destination = register1 <= register2//check if register1 is less than or equal to register2 and assign to destination
+```
+#### AND
+```assembly
+and <register1> <register2> <destination>;$destination = $register1 && $register2
+```
+Same as
+```cpp
+destination = register1 && register2//check if register1 and register2 are true and assign to destination
+```
+#### OR
+```assembly
+or <register1> <register2> <destination>;$destination = $register1 || $register2
+```
+Same as
+```cpp
+destination = register1 || register2//check if register1 or register2 is true and assign to destination
+```
+#### BIT_OR
+```assembly
+bit_or <register1> <register2> <destination>;$destination = $register1 | $register2
+```
+Same as
+```cpp
+destination = register1 | register2//bitwise or register1 and register2 and assign to destination
+```
+#### BIT_AND
+```assembly
+bit_and <register1> <register2> <destination>;$destination = $register1 & $register2
+```
+Same as
+```cpp
+destination = register1 & register2//bitwise and register1 and register2 and assign to destination
+```
+#### SHL
+```assembly
+shl <register1> <register2> <destination>;$destination = $register1 << $register2
+```
+Same as
+```cpp
+destination = register1 << register2//shift register1 left by register2 and assign to destination
+```
+#### SHR
+```assembly
+shr <register1> <register2> <destination>;$destination = $register1 >> $register2
+```
+Same as
+```cpp
+destination = register1 >> register2//shift register1 right by register2 and assign to destination
+```
+#### NEG
+```assembly
+neg <register1> <destination>;$destination = -$register1
+```
+Same as
+```cpp
+destination = -register1//negate register1 and assign to destination
+```
+#### NOT
+```assembly
+not <register1> <destination>;$destination = !$register1
+```
+Same as
+```cpp
+destination = !register1//logical not register1 and assign to destination
+```
+#### BIT_NOT
+```assembly
+bit_not <register1> <destination>;$destination = ~$register1
+```
+Same as
+```cpp
+destination = ~register1//bitwise not register1 and assign to destination
+```
+
+#### JMP
+```assembly
+jmp <label>;label()
+```
+Same as
+```cpp
+label()//call label
+```
+
+#### DL_OPEN
+```assembly
+dl_open <register1> <destination>;$destination = dlopen($register1)
+```
+Same as
+```cpp
+destination = dlopen(register1)//load dynamic library register1 and assign to destination
+```
+
+#### DL_CLOSE
+```assembly
+dl_close <register1> ;dlclose($register1)
+```
+Same as
+```cpp
+dlclose(register1)//close dynamic library register1
+```
+
+#### DL_CALL
+```assembly
+dl_call <register1> <register2> <register3>;temp = dlsym($register1, $register2); temp($register3)
+```
+Same as
+```cpp
+temp = dlsym(register1, register2);//load the function register2 from dynamic library register1 and assign it to temp
+temp(register3,memory); //then call temp argument register3 and memory
+```
+#### RET
+```assembly
+ret
+```
+Same as
+```cpp
+return//return from label or stop the execution of the vm. It should always be present at the end of the program and any label
+```

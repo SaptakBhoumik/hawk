@@ -301,6 +301,7 @@ HawkOperation back(HawkType left){
     return op;
 }
 HawkType* HAWK_CONSTRUCT::get_code(){
+    m_code.push_back(get_op(OP_RET));
     code=(HawkType*)malloc(sizeof(HawkType)*m_code.size());
     for(int i=0;i<m_code.size();i++){
         code[i]=m_code[i];
